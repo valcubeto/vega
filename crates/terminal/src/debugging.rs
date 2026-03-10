@@ -9,18 +9,19 @@ pub fn debug_header(file: &str, line: u32, column: u32) {
 
 #[macro_export]
 macro_rules! debug {
-    ($msg:literal) => {{
+    ($msg:literal $(, $($value:expr),+)?) => {
         #[cfg(debug_assertions)]
         {
             use $crate::__macro_deps::OwoColorize;
             $crate::debugging::debug_header(file!(), line!(), column!());
-            println!("    {} {}", "#".blue().italic(), $msg.blue().italic());
+            #[allow(clippy::useless_format)]
+            println!("    {} {}", "#".blue().italic(), format!($msg, $($($value),+)?).blue().italic());
         }
-    }};
+    };
     ($val:expr) => {{
         #[cfg(debug_assertions)]
         {
-            use $crate::OwoColorize;
+            use $crate::__macro_deps::OwoColorize;
             $crate::debugging::debug_header(file!(), line!(), column!());
             println!("    {} {} {:?}", stringify!($val).bold(), "=".blue(), $val);
         }

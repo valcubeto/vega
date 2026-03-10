@@ -4,6 +4,7 @@ mod prelude;
 use terminal::debug;
 
 fn main() {
+    debug!("Running Vega v{}", env!("CARGO_PKG_VERSION"));
     debug!("ArgParser: parse command line arguments");
     debug!("CommandLoader: load subcommand based on args");
 }
