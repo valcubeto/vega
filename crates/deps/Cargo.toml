@@ -1,0 +1,8 @@
+[package]
+name = "deps"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+chrono = { version = "0.4.44", default-features = false }
+owo-colors = "4.3.0"

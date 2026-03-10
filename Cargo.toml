@@ -1,10 +1,12 @@
-[package]
-name = "vega"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = [
+    "app",
+    "crates/*"
+]
+package.edition = "2024"
+package.version = "0.1.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-owo-colors = "4.3.0"
-
+[workspace.dependencies]
+terminal = { path = "crates/terminal" }
+deps = { path = "crates/deps" }
