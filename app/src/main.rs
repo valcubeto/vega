@@ -1,5 +1,6 @@
 mod args;
 mod prelude;
+mod tests;
 
 use terminal::debug;
 
