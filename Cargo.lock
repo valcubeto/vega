@@ -3,11 +3,16 @@
 version = 4
 
 [[package]]
-name = "app"
+name = "Vega"
 version = "0.1.0"
 dependencies = [
+ "args",
  "terminal",
 ]
+
+[[package]]
+name = "args"
+version = "0.1.0"
 
 [[package]]
 name = "autocfg"

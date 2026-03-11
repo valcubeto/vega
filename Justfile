@@ -1,3 +1,6 @@
+default:
+	@ just --list --unsorted
+
 test:
 	cargo nextest run --no-capture -r
 
@@ -13,3 +16,7 @@ debug:
 run:
 	cargo run -qr
 
+add *deps='':
+	cd "crates/deps"
+	# cargo add "$@"
+	echo {{deps}}

@@ -1,13 +1,20 @@
-mod args;
 mod prelude;
 mod tests;
 
+use args::Args;
 use terminal::debug;
 
+pub const NAME: &str = env!("CARGO_PKG_NAME");
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 fn main() {
-    debug!("Running Vega v{}", env!("CARGO_PKG_VERSION"));
+    debug!("Running {NAME} v{VERSION}");
     debug!("ArgParser: parse command line arguments");
+    let args = Args::parse();
+    debug!(args);
     debug!("CommandLoader: load subcommand based on args");
+    // let command = CommandLoader::load(args.subcommand);
+    // command.run()
 }
 
 /*
