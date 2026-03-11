@@ -1,0 +1,6 @@
+[package]
+name = "args"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]

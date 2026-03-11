@@ -1,14 +1,17 @@
 #[doc(hidden)]
 pub fn debug_header(file: &str, line: u32, column: u32) {
     use deps::owo_colors::OwoColorize;
-    // TODO: add timestamp
+    // Note: should I add timestamps?
     println!("[{}: {}:{}:{}]", "debug".bright_yellow().bold(), file.bold(), line, column);
 }
 
-/// `debug!(<literal>, <values...>)` prints a comment-like
-/// message.
+/// `debug!(<literal>, <values...>)`:
+/// - Prints a comment-like message.
+/// - Behaves like `println!`
 ///
-/// `debug!(<expr>)` prints `<expr> = <result>`.
+/// `debug!(<expr>)`:
+/// - Prints `<expr> = <result>`.
+/// - Behaves like `dbg!`
 ///
 /// Both with a nice header.
 ///
