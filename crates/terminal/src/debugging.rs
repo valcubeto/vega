@@ -1,7 +1,6 @@
 #[doc(hidden)]
 pub fn debug_header(file: &str, line: u32, column: u32) {
-    use deps::owo_colors::OwoColorize;
-    // Note: should I add timestamps?
+    use owo_colors::OwoColorize;
     println!("[{}: {}:{}:{}]", "debug".bright_yellow().bold(), file.bold(), line, column);
 }
 
@@ -36,6 +35,8 @@ macro_rules! debug {
         {
             use $crate::__macro_deps::OwoColorize;
             $crate::debugging::debug_header(file!(), line!(), column!());
+            // I don't think clippy will ever be able to
+            // catch this, but just in case.
             #[allow(clippy::useless_format)]
             println!("    {} {}", "#".blue().italic(), format!($msg, $($($value),+)?).blue().italic());
         }
@@ -51,11 +52,14 @@ macro_rules! debug {
     };
 }
 
+// TODO: move this.
 pub trait Indent<T: AsRef<str>> {
     fn indent(&self, n: usize) -> String;
 }
 
 impl<T> Indent<T> for T where T: AsRef<str> {
+    // Note: I just wanted to use it quickly.
+    //       Sorry if it looks JavaScript-ish.
     fn indent(&self, n: usize) -> String {
         self.as_ref().lines()
             .map(|line| " ".repeat(n) + line)

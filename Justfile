@@ -18,14 +18,32 @@ debug:
 run:
 	@ cargo run --release --quiet
 
-add dep:
-	@ # Seems like each line gets it's own sub-shell...
-	@ echo "cargo add {{dep}}"
-	@ \
-		cd "crates/deps"; \
-		cargo add {{dep}} > "/dev/null" && \
-		DEP="{{dep}}" && \
-		echo "pub use ${DEP//-/_};" >> "src/lib.rs"
-	@ echo "Added dependency {{dep}} globally."
+# Build and move all dependencies to the "out" dir.
+release:
+	# Not implemented.
+
+# Usage: just add colorchoice to args
+add dep _preposition='' crate='':
+	#!/bin/env bash
+	set -e
+	# Shut up the "unused" warning.
+	echo "{{_preposition}}" > /dev/null
+	echo "Adding dependency {{dep}} globally..."
+	fatal() {
+		echo "$1"
+		exit 1
+	}
+	# --limit=1 but still does the whole search...
+	cargo search {{dep}} --limit=1 --quiet --color=never \
+		| grep -E --only-matching '^{{dep}} = ".+?"' --color=never \
+		>> "Cargo.toml" \
+		|| fatal "Dependency not found."
+	echo "Done."
+	test -z "{{crate}}" && exit 0
+	test -d "crates/{{crate}}" \
+		|| fatal "There's no \"{{crate}}\" crate."
+	echo "{{dep}} = { workspace = true }" \
+		>> "crates/{{crate}}/Cargo.toml"
+	echo "Also added opt-in to the {{crate}} crate's manifest."
 
 alias dbg := debug

@@ -9,9 +9,12 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() {
     debug!("Running {NAME} v{VERSION}");
+
     debug!("ArgParser: parse command line arguments");
-    let args = Args::parse();
+    #[allow(unused)]
+    let mut args = Args::parse();
     debug!(args);
+
     debug!("CommandLoader: load subcommand based on args");
     // let command = CommandLoader::load(args.subcommand);
     // command.run()

@@ -4,4 +4,4 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-deps = { workspace = true }
+owo-colors = { workspace = true }

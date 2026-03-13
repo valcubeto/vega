@@ -1,0 +1,5 @@
+# use core::prelude::*
+
+fun main() {
+    println("Hello, world!")
+}

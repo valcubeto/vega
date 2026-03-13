@@ -1,0 +1,17 @@
+use core::prelude::*
+
+# Your entry point
+fun main() {
+    println("1 + 1 = ${add(1, 2)}")
+    println(apply("hello") { str => str + "!" })
+}
+
+fun add(a: Int32, b: Int32): Int32 {
+    ret a + b
+}
+
+fun do_nothing<T>(value: T): T = value
+
+fun apply<T, U>(val: T, f: { T => U }): U {
+    ret f(val)
+}

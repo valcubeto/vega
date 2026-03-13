@@ -7,6 +7,8 @@ pub struct ProgramOptions {
     pub colors: Coloring,
 }
 
+// TODO: Vec::drain_filter to remove flags
+// TODO: use the chrono
 impl FromArgs for ProgramOptions {
     fn from_args(_args: &mut RawArgs) -> Self {
         ProgramOptions {
@@ -26,6 +28,8 @@ pub enum Verbosity {
     Verbose
 }
 
+// I'm gonna be honest with you.
+// I don't like using bool inside structs.
 #[allow(dead_code)]
 #[cfg_attr(debug_assertions, derive(Debug))]
 pub enum Coloring {

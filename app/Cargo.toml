@@ -1,8 +1,8 @@
 [package]
-name = "Vega"
+name = "vega"
 edition.workspace = true
 version.workspace = true
 
 [dependencies]
 terminal = { workspace = true }
-args = { path = "../crates/args" }
+args = { workspace = true }
