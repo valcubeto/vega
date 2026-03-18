@@ -10,10 +10,10 @@ pub fn run_external(cmd_name: &str, args: &[String]) {
     debug!("Searching command {bin_name:?}.");
     let bin_path = find_external(&bin_name);
     debug!("The command does exist. Executing <{bin_path:?} {}>...", args.join(" "));
-    let command = Command::new(&bin_path)
+    let _command = Command::new(&bin_path)
         .args(args)
         .status()
-        .expect("program failed (todo: proper error)");
+        .expect("failed to execute (todo: proper error)");
 }
 
 fn find_external(bin_name: &str) -> PathBuf {

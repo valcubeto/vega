@@ -1,10 +1,12 @@
 mod tests;
+mod builtin_commands;
 
 use terminal::debug;
 use args::ParsedArgs;
 use command_loader::run_external;
-#[allow(unused_imports)]
-use strings::*;
+#[cfg(debug_assertions)]
+use strings::{ NAME, VERSION };
+use builtin_commands::*;
 
 fn main() {
     debug!("Running {NAME} v{VERSION}.");
@@ -16,10 +18,10 @@ fn main() {
 
     match args.subcommand {
         Some(cmd) if is_help_command(&cmd) => {
-            todo!("help")
+            print_help();
         }
         Some(cmd) if is_version_command(&cmd) => {
-            todo!("version")
+            print_version();
         }
         Some(cmd) => {
             run_external(&cmd, &args.args)
