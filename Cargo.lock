@@ -16,10 +16,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 
 [[package]]
+name = "command-loader"
+version = "0.1.0"
+dependencies = [
+ "strings",
+ "terminal",
+]
+
+[[package]]
 name = "owo-colors"
 version = "4.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d211803b9b6b570f68772237e415a029d5a50c65d382910b879fb19d3271f94d"
+
+[[package]]
+name = "strings"
+version = "0.1.0"
 
 [[package]]
 name = "terminal"
@@ -33,5 +45,11 @@ name = "vega"
 version = "0.1.0"
 dependencies = [
  "args",
+ "command-loader",
+ "strings",
  "terminal",
 ]
+
+[[package]]
+name = "vega-run"
+version = "0.1.0"

@@ -3,22 +3,43 @@ set shell := ["bash", "-c"]
 default:
 	@ just --list --unsorted
 
+tree:
+	#!/bin/env bash
+	cargo tree -p "vega*" --prefix=depth --format=" {p}" \
+		| awk '{
+			depth = $1
+			$1 = ""
+			for (i = 0; i < depth; i++) {
+				printf "    "
+			}
+			sub(/^ /, "")
+			print
+		}'
+
 test:
-	cargo nextest run --no-capture --release --quiet
+	cargo nextest run --no-capture --release
 
 test-debug:
-	cargo nextest run --no-capture --quiet
+	cargo nextest run --no-capture
 
 build:
 	@ cargo build --release
 
-debug:
-	@ cargo run --quiet
+vega-debug *args='':
+	#!/bin/env bash
+	# Possible errors and warnings are
+	# printed again by `cargo run`.
+	cargo build --quiet > "/dev/null"
+	PATH="target/debug:$PATH" cargo run --bin=vega --quiet -- {{args}}
 
-run:
-	@ cargo run --release --quiet
+alias vega-dbg := vega-debug
 
-# Build and move all dependencies to the "out" dir.
+# This command just keeps growing...
+vega *args='':
+	@ cargo build --release --quiet
+	@ PATH="target/release:$PATH" cargo run --bin=vega --release --quiet -- {{args}}
+
+# Build and move all dependencies to the "out/bin" dir.
 release:
 	# Not implemented.
 
@@ -26,19 +47,20 @@ release:
 add dep _preposition='' crate='':
 	#!/bin/env bash
 	set -e
-	# Shut up the "unused" warning.
-	echo "{{_preposition}}" > /dev/null
-	echo "Adding dependency {{dep}} globally..."
 	fatal() {
 		echo "$1"
 		exit 1
 	}
+	# Shut up the "unused" warning.
+	echo "{{_preposition}}" > /dev/null
+	echo "Adding dependency {{dep}} globally..."
 	# --limit=1 but still does the whole search...
 	cargo search {{dep}} --limit=1 --quiet --color=never \
 		| grep -E --only-matching '^{{dep}} = ".+?"' --color=never \
 		>> "Cargo.toml" \
 		|| fatal "Dependency not found."
 	echo "Done."
+	# If no crate specified, just exit
 	test -z "{{crate}}" && exit 0
 	test -d "crates/{{crate}}" \
 		|| fatal "There's no \"{{crate}}\" crate."
@@ -46,4 +68,27 @@ add dep _preposition='' crate='':
 		>> "crates/{{crate}}/Cargo.toml"
 	echo "Also added opt-in to the {{crate}} crate's manifest."
 
-alias dbg := debug
+new crate:
+	#!/bin/env bash
+	set -e
+	fatal() {
+		echo "$1"
+		exit 1
+	}
+	cd crates
+	test -d {{crate}} \
+		&& fatal "The {{crate}} crate already exists."
+	cargo new {{crate}} --lib
+	# Clean the file.
+	echo "" > "{{crate}}/src/lib.rs"
+	cd ..
+	echo '{{crate}} = { path = "crates/{{crate}}" }' \
+		>> "Cargo.toml"
+
+new-command name:
+	#!/bin/env bash
+	cd commands
+	cargo new {{name}} --bin
+
+alias new-cmd := new-command
+

@@ -1,0 +1,8 @@
+[package]
+name = "vega-run"
+repository.workspace = true
+readme.workspace = true
+edition.workspace = true
+version = "0.1.0"
+
+[dependencies]

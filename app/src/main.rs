@@ -1,23 +1,45 @@
-mod prelude;
 mod tests;
 
-use args::Args;
 use terminal::debug;
-
-pub const NAME: &str = env!("CARGO_PKG_NAME");
-pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+use args::ParsedArgs;
+use command_loader::run_external;
+#[allow(unused_imports)]
+use strings::*;
 
 fn main() {
-    debug!("Running {NAME} v{VERSION}");
+    debug!("Running {NAME} v{VERSION}.");
 
-    debug!("ArgParser: parse command line arguments");
+    debug!("Parsing command line arguments.");
     #[allow(unused)]
-    let mut args = Args::parse();
+    let mut args = ParsedArgs::parse();
     debug!(args);
 
-    debug!("CommandLoader: load subcommand based on args");
+    match args.subcommand {
+        Some(cmd) if is_help_command(&cmd) => {
+            todo!("help")
+        }
+        Some(cmd) if is_version_command(&cmd) => {
+            todo!("version")
+        }
+        Some(cmd) => {
+            run_external(&cmd, &args.args)
+        }
+        None => {
+            todo!("default cmd")
+        }
+    }
     // let command = CommandLoader::load(args.subcommand);
     // command.run()
+}
+
+#[inline]
+fn is_help_command(cmd: &str) -> bool {
+    cmd == "help" || cmd == "--help" || cmd == "-h"
+}
+
+#[inline]
+fn is_version_command(cmd: &str) -> bool {
+    cmd == "version" || cmd == "--version" || cmd == "-V"
 }
 
 /*

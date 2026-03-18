@@ -3,6 +3,7 @@
 #[test]
 fn debugging() {
     use terminal::debug;
+
     debug!("A nice message");
 
     #[derive(Debug)]

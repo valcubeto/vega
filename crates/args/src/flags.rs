@@ -4,6 +4,7 @@ pub fn drain_flags(args: &RawArgs, candidates: Flags) -> (Vec<String>, Vec<FlagV
     let mut args_iter = args.iter();
     let mut positionals = vec![];
     let mut flags = vec![];
+    // Avoid that implicit call to into_iter.
     while let Some(arg) = args_iter.next() {
         if arg == "--" {
             break;

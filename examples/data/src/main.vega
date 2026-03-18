@@ -1,0 +1,56 @@
+use core::prelude::*
+
+fun main() {
+    let point = new Point { -36, 54 }.invert()
+    point.opposite()
+}
+
+struct Point {
+    pub x, y: Int32
+
+    fun invert(mut self): Self {
+        self.x = -self.x
+        self.y = -self.y
+        self
+    }
+
+    fun opposite(self): Point = {
+        new Point { -self.x, -self.y }
+    }
+}
+
+enum Result<T, E> {
+    #[constructible]
+    Ok { value: T }
+
+    #[constructible]
+    Err { error: E }
+
+    #[must_use]
+    fun expect(self, message: String): T {
+        match self {
+            Ok { value } -> value
+            else -> fatal(message)
+        }
+    }
+
+    #[must_use]
+    fun get(self): T =
+        self.expect("Unwrapped an Err value.")
+
+    #[must_use]
+    fun getOr(self, other: T): T {
+        match self {
+            Ok { value } -> value
+            else -> other
+        }
+    }
+
+    #[must_use]
+    fun getOrElse(self, getOther: Callable<(), T>): T {
+        match self {
+            Ok { value } -> value
+            else -> getOther()
+        }
+    }
+}
