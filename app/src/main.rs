@@ -3,10 +3,8 @@ mod builtin_commands;
 
 use terminal::debug;
 use args::ParsedArgs;
-use command_loader::run_external;
 #[cfg(debug_assertions)]
 use strings::{ NAME, VERSION };
-use builtin_commands::*;
 
 fn main() {
     debug!("Running {NAME} v{VERSION}.");
@@ -18,16 +16,22 @@ fn main() {
 
     match args.subcommand {
         Some(cmd) if is_help_command(&cmd) => {
-            print_help();
+            builtin_commands::help::print_help();
         }
         Some(cmd) if is_version_command(&cmd) => {
-            print_version();
+            builtin_commands::version::print_version();
+        }
+        Some(cmd) if cmd == "init" => {
+            builtin_commands::init::init_project(&args.args);
+        }
+        Some(cmd) if cmd == "new" => {
+            builtin_commands::new::create_project(&args.args);
         }
         Some(cmd) => {
-            run_external(&cmd, &args.args)
+            command_loader::run_external(&cmd, &args.args);
         }
         None => {
-            todo!("default cmd")
+            builtin_commands::default::print_default();
         }
     }
     // let command = CommandLoader::load(args.subcommand);

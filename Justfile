@@ -5,7 +5,7 @@ default:
 
 tree:
 	#!/bin/env bash
-	cargo tree -p "vega*" --prefix=depth --format=" {p}" \
+	cargo tree --package "vega*" --prefix=depth --format=" {p}" \
 		| awk '{
 			depth = $1
 			$1 = ""
@@ -30,14 +30,15 @@ vega-debug *args='':
 	# Possible errors and warnings are
 	# printed again by `cargo run`.
 	cargo build --quiet > "/dev/null"
-	PATH="target/debug:$PATH" cargo run --bin=vega --quiet -- {{args}}
+	VEGA_HOME="./out/bin" PATH="target/debug:$PATH" cargo run --bin=vega --quiet -- {{args}}
 
 alias vega-dbg := vega-debug
 
 # This command just keeps growing...
 vega *args='':
-	@ cargo build --release --quiet
-	@ PATH="target/release:$PATH" cargo run --bin=vega --release --quiet -- {{args}}
+	#!/bin/env bash
+	cargo build --release --quiet > "/dev/null"
+	VEGA_HOME="$PWD/out" PATH="target/release:$PATH" cargo run --bin=vega --release --quiet -- {{args}}
 
 # Build and move all dependencies to the "out/bin" dir.
 release:

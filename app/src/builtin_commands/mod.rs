@@ -1,7 +1,8 @@
 #![allow(unused_imports)]
 
-mod help;
-mod version;
+pub mod help;
+pub mod version;
+pub mod default;
+pub mod init;
+pub mod new;
 
-pub use help::*;
-pub use version::*;

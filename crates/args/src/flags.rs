@@ -1,11 +1,12 @@
 
 #[allow(clippy::while_let_on_iterator)]
 pub fn drain_flags(args: &RawArgs, candidates: Flags) -> (Vec<String>, Vec<FlagValue>) {
-    let mut args_iter = args.iter();
+    let mut args_iter = args.iter().enumerate();
     let mut positionals = vec![];
     let mut flags = vec![];
+
     // Avoid that implicit call to into_iter.
-    while let Some(arg) = args_iter.next() {
+    while let Some((i, arg)) = args_iter.next() {
         if arg == "--" {
             break;
         }
@@ -20,7 +21,7 @@ pub fn drain_flags(args: &RawArgs, candidates: Flags) -> (Vec<String>, Vec<FlagV
                                 long_flag[..flag.long.len() + 1].to_string()
                             ),
                             None => FlagValue::String(
-                                args_iter.next().expect("flag requires a value").clone()
+                                args_iter.next().expect("flag requires a value").1.clone()
                             ),
                             Some(_) => panic!("unknown flag")
                         }
@@ -29,14 +30,18 @@ pub fn drain_flags(args: &RawArgs, candidates: Flags) -> (Vec<String>, Vec<FlagV
             }
             continue;
         }
-        if let Some(_short_flag) = arg.strip_prefix('-') {
-            // if candidates.iter().find()
-            todo!();
+        if let Some(short_flag) = arg.strip_prefix('-') {
+            for letter in short_flag.chars() {
+                if !letter.is_ascii_alphanumeric() {
+                    panic!("invalid flag at pos {}", i + 1);
+                }
+            }
+            todo!("short flags");
             // continue;
         }
         positionals.push(arg.clone())
     }
-    while let Some(arg) = args_iter.next() {
+    while let Some((_i, arg)) = args_iter.next() {
         positionals.push(arg.clone())
     }
     (positionals, flags)
