@@ -30,7 +30,7 @@ vega-debug *args='':
 	# Possible errors and warnings are
 	# printed again by `cargo run`.
 	cargo build --quiet > "/dev/null"
-	VEGA_HOME="./out/bin" PATH="target/debug:$PATH" cargo run --bin=vega --quiet -- {{args}}
+	VEGA_HOME="./out" PATH="target/debug:$PATH" cargo run --bin=vega --quiet -- {{args}}
 
 alias vega-dbg := vega-debug
 
