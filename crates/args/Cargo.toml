@@ -4,4 +4,4 @@ edition.workspace = true
 version.workspace = true
 
 [dependencies]
-colorchoice = { workspace = true }
+colorchoice.workspace = true

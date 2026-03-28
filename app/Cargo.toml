@@ -4,7 +4,7 @@ edition.workspace = true
 version.workspace = true
 
 [dependencies]
-terminal = { workspace = true }
-args = { workspace = true }
-command-loader = { workspace = true }
-strings = { workspace = true }
+terminal.workspace = true
+args.workspace = true
+command-loader.workspace = true
+strings.workspace = true

@@ -1,7 +1,7 @@
 // Your entry point
 fun main() {
     println("1 + 1 = ${add(1, 2)}")
-    println(apply("hello", fun (str) = str + "!"))
+    println(apply("hello", do str = str + "!"))
 }
 
 fun add(a: Int32, b: Int32): Int32 {

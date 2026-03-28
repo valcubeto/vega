@@ -1,10 +1,10 @@
 [package]
 name = "command-loader"
-repository.workspace = true
-readme.workspace = true
 edition.workspace = true
 version.workspace = true
+repository.workspace = true
+readme.workspace = true
 
 [dependencies]
-strings = { workspace = true }
-terminal = { workspace = true }
+strings.workspace = true
+terminal.workspace = true

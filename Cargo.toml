@@ -11,7 +11,7 @@ repository = "https://github.com/valcubeto/vega"
 readme = "README.md"
 
 [workspace.dependencies]
-vega = { path = "app" }
+vega.path = "app"
 terminal = { path = "crates/terminal" }
 args = { path = "crates/args" }
 command-loader = { path = "crates/command-loader" }
