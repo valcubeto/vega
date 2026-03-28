@@ -10,33 +10,32 @@ Types:
 - System-defined size numbers: `Size`, `Offset`
 - Floats: `Float32`, `Float64`
 - Text: `Char`, `String`
-- Lists: `Array` (fixed-size), `List` (extensible), tuples
+- Lists: `Slice` (fixed-size), `Array` (extensible), tuples
 - Collections: `Map`, `Dict`
 
 Static variables:
-```kotlin
-const NAME: String = "Dan"
-state AGE: UInt8 = 25
+```crystal
+const VERSION: String = "0.1.0"
+state COUNTER: UInt8 = 0
 ```
 
 Functions:
-```kotlin
+```crystal
 // Optional args and return type
 fun main(args: Args): Nothing {
-    let lambda = { x, y => x + y }
+    let closure = do x, y -> x + y
 }
 ```
 
 Interfaces:
-```kotlin
+```crystal
 class Indent {
     fun indent(self, n: Size): Self
 }
 
 impl Indent for String {
     fun indent(self, n: Size = 1): Self {
-        // map_lines doesn't drop line breaks.
-        self.map_lines({ line => "    ".repeat(n) + line })
+        self.map_lines(do line -> "    ".repeat(n) + line)
             .collect()
     }
 }
