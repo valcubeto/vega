@@ -1,5 +1,5 @@
 #[doc(hidden)]
-pub mod __macro_deps {
+pub mod _macro_deps {
     pub use owo_colors::OwoColorize;
 }
 pub mod debugging;

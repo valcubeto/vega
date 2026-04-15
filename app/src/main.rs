@@ -1,31 +1,31 @@
 mod tests;
 mod builtin_commands;
 
-use terminal::debug;
+use terminal::{debug, fatal};
 use args::ParsedArgs;
 #[cfg(debug_assertions)]
 use strings::{ NAME, VERSION };
 
 fn main() {
     debug!("Running {NAME} v{VERSION}.");
+    terminal::syntax_err!("hello");
 
-    debug!("Parsing command line arguments.");
     #[allow(unused)]
     let mut args = ParsedArgs::parse();
     debug!(args);
 
     match args.subcommand {
         Some(cmd) if is_help_command(&cmd) => {
-            builtin_commands::help::print_help();
+            builtin_commands::vega_help::print_help();
         }
         Some(cmd) if is_version_command(&cmd) => {
-            builtin_commands::version::print_version();
+            builtin_commands::vega_version::print_version();
         }
         Some(cmd) if cmd == "init" => {
-            builtin_commands::init::init_project(&args.args);
+            builtin_commands::vega_init::init_project(&args.args);
         }
         Some(cmd) if cmd == "new" => {
-            builtin_commands::new::create_project(&args.args);
+            builtin_commands::vega_new::create_project(&args.args);
         }
         Some(cmd) => {
             command_loader::run_external(&cmd, &args.args);

@@ -1,8 +1,7 @@
 #![allow(unused_imports)]
 
-pub mod help;
-pub mod version;
 pub mod default;
-pub mod init;
-pub mod new;
-
+pub mod vega_help;
+pub mod vega_version;
+pub mod vega_init;
+pub mod vega_new;

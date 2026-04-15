@@ -1,7 +1,7 @@
 #[doc(hidden)]
 pub fn debug_header(file: &str, line: u32, column: u32) {
     use owo_colors::OwoColorize;
-    println!("[{}: {}:{}:{}]", "debug".bright_yellow().bold(), file.bold(), line, column);
+    println!("[{}: {}:{}:{}]", "debug".bright_yellow().bold(), file, line, column);
 }
 
 /// `debug!(<literal>, <values...>)`:
@@ -33,7 +33,7 @@ macro_rules! debug {
     ($msg:literal $(, $($value:expr),+)?) => {
         #[cfg(debug_assertions)]
         {
-            use $crate::__macro_deps::OwoColorize;
+            use $crate::_macro_deps::OwoColorize;
             $crate::debugging::debug_header(file!(), line!(), column!());
             // I don't think clippy will ever be able to
             // catch this, but just in case.
@@ -44,26 +44,23 @@ macro_rules! debug {
     ($val:expr) => {
         #[cfg(debug_assertions)]
         {
-            use $crate::__macro_deps::OwoColorize;
-            use $crate::debugging::Indent;
-            $crate::debugging::debug_header(file!(), line!(), column!());
-            println!("{}", format!("{} {} {}", stringify!($val).bold(), "=".blue(), format!("{:#?}", $val)).indent(4));
+            use $crate::_macro_deps::OwoColorize;
+            use $crate::debugging::{ indent, debug_header };
+            debug_header(file!(), line!(), column!());
+            let msg = format!("{} {} {}", stringify!($val).bold(), "=".blue(), format!("{:#?}", $val));
+            println!("{}", indent(msg, 4));
         }
     };
 }
 
-// TODO: move this.
-pub trait Indent<T: AsRef<str>> {
-    fn indent(&self, n: usize) -> String;
-}
-
-impl<T> Indent<T> for T where T: AsRef<str> {
-    // Note: I just wanted to use it quickly.
-    //       Sorry if it looks JavaScript-ish.
-    fn indent(&self, n: usize) -> String {
-        self.as_ref().lines()
-            .map(|line| " ".repeat(n) + line)
-            .collect::<Vec<String>>()
-            .join("\n")
-    }
+/*
+ * NOTE:
+ * I just wanted to use it quickly.
+ * Sorry if it looks JavaScript-ish.
+ */
+pub fn indent(string: impl AsRef<str>, n: usize) -> String {
+    string.as_ref().split('\n')
+          .map(|line| " ".repeat(n) + line)
+          .collect::<Vec<String>>()
+          .join("\n")
 }

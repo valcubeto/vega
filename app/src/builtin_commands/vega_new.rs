@@ -1,6 +1,6 @@
 use args::flags::RawArgs;
 use terminal::debug;
-use super::init::init_project;
+use super::vega_init::init_project;
 
 pub fn create_project(args: &RawArgs) {
     debug!("Creating project with args {args:?}");

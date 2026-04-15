@@ -92,4 +92,3 @@ new-command name:
 	cargo new {{name}} --bin
 
 alias new-cmd := new-command
-

@@ -1,5 +1,6 @@
 # The Vega programming language.
-I will document properly after adding functionality.<br />
+I will document properly after adding functionality.
+
 At the moment this program does nothing.
 
 # Quick docs
@@ -10,7 +11,7 @@ Types:
 - System-defined size numbers: `Size`, `Offset`
 - Floats: `Float32`, `Float64`
 - Text: `Char`, `String`
-- Lists: `Slice` (fixed-size), `Array` (extensible), tuples
+- Lists: `Slice` (fixed-size), `Array` (extensible), `Set`, tuples
 - Collections: `Map`, `Dict`
 
 Static variables:
@@ -22,20 +23,19 @@ state COUNTER: UInt8 = 0
 Functions:
 ```crystal
 // Optional args and return type
-fun main(args: Args): Nothing {
-    let closure = do x, y -> x + y
-}
+fun main(args: Args) -> Nothing {
+    let closure = take x, y do x + y
 ```
 
 Interfaces:
 ```crystal
-class Indent {
-    fun indent(self, n: Size): Self
+interface Indent {
+    fun indent(self, n: Size) -> Self
 }
 
 impl Indent for String {
-    fun indent(self, n: Size = 1): Self {
-        self.map_lines(do line -> "    ".repeat(n) + line)
+    fun indent(self, n: Size = 1) -> Self {
+        self.map_lines((line) => "    ".repeat(n) + line)
             .collect()
     }
 }
