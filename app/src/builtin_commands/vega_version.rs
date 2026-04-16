@@ -1,5 +1,5 @@
 use terminal::debug;
-use strings::{ NAME, VERSION };
+use prelude::strings::{ NAME, VERSION };
 
 pub fn print_version() {
     debug!("TODO: accept verbosity");

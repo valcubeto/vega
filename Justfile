@@ -83,7 +83,7 @@ new crate:
 	# Clean the file.
 	echo "" > "{{crate}}/src/lib.rs"
 	cd ..
-	echo '{{crate}} = { path = "crates/{{crate}}" }' \
+	echo '{{crate}}.path = "crates/{{crate}}"' \
 		>> "Cargo.toml"
 
 new-command name:

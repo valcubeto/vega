@@ -1,10 +1,10 @@
 [package]
-name = "vega"
+name = "prelude"
 edition.workspace = true
 version.workspace = true
+authors.workspace = true
+repository.workspace = true
+readme.workspace = true
 
 [dependencies]
 terminal.workspace = true
-args.workspace = true
-command-loader.workspace = true
-prelude.workspace = true

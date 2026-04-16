@@ -1,32 +1,21 @@
-#[macro_export]
-macro_rules! fatal {
-    ($msg:literal $(, $($value:expr),+)?) => {
-        use $crate::_macro_deps::OwoColorize;
-        #[allow(clippy::useless_format)]
-        eprintln!("{}: {}", "Error".bright_red().bold(), format!($msg $(, $($value),+)?));
-        ::std::process::exit(1);
-    };
-    (@ $name:literal, $msg:literal $(, $($value:expr),+)?) => {
-        use $crate::_macro_deps::OwoColorize;
-        #[allow(clippy::useless_format)]
-        eprintln!("{}: {}", $name.bright_red().bold(), format!($msg $(, $($value),+)?));
-        ::std::process::exit(1);
-    };
-}
-
-macro_rules! other_errors {
-    ($doll:tt, $($name:ident!($repr:literal)),+) => {
+macro_rules! define_errors {
+    ($_:tt $( $name:ident!($repr:literal); )+) => {
         $(
             #[macro_export]
             macro_rules! $name {
-                ($msg:literal $doll(, $doll($value:expr),+)?) => {
-                    $crate::fatal!(@ $repr, $msg $doll(, $doll($value),+)?)
-                };
+                ($_ msg:literal $_(, $_($_ value:expr),+)?) => {{
+                    use $_ crate::_macro_deps::OwoColorize;
+                    #[allow(clippy::useless_format)]
+                    eprintln!("{}: {}", $repr.bright_red().bold(), format!($_ msg $_(, $_($_ value),+)?));
+                    ::std::process::exit(1);
+                }};
             }
         )+
     };
 }
 
-other_errors! { $,
-    syntax_err!("Syntax error")
+define_errors! { $
+    fatal!("Error");
+    syntax_err!("Syntax error");
+    todo_err!("Not yet implemented");
 }

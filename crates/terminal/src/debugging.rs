@@ -30,7 +30,7 @@ pub fn debug_header(file: &str, line: u32, column: u32) {
 /// ```
 #[macro_export]
 macro_rules! debug {
-    ($msg:literal $(, $($value:expr),+)?) => {
+    ($msg:literal $( , $( $value:expr ),+ )?) => {
         #[cfg(debug_assertions)]
         {
             use $crate::_macro_deps::OwoColorize;
@@ -38,7 +38,7 @@ macro_rules! debug {
             // I don't think clippy will ever be able to
             // catch this, but just in case.
             #[allow(clippy::useless_format)]
-            println!("    {} {}", "#".blue().italic(), format!($msg, $($($value),+)?).blue().italic());
+            println!("    {} {}", "#".blue().italic(), format!($msg, $( $( $value ),+ )?).blue().italic());
         }
     };
     ($val:expr) => {

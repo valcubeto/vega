@@ -1,5 +1,5 @@
 use terminal::debug;
-use strings::NAME_CAPITALIZED;
+use prelude::strings::NAME_CAPITALIZED;
 
 pub fn print_help() {
     debug!("todo: use the -v flag");

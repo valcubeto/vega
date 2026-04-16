@@ -1,7 +1,13 @@
 [workspace]
-metadata = { name = "Vega" }
 resolver = "3"
-members = ["app", "crates/*", "commands/*"]
+members = [
+    "app",
+    "crates/*",
+    "commands/*",
+    "language/frontend/*",
+    "language/syntax",
+    # "language/backend/*",
+]
 
 [workspace.package]
 edition = "2024"
@@ -12,11 +18,13 @@ readme = "README.md"
 
 [workspace.dependencies]
 vega.path = "app"
-terminal = { path = "crates/terminal" }
-args = { path = "crates/args" }
-command-loader = { path = "crates/command-loader" }
-owo-colors = "4.3.0"
-colorchoice = "1.0.4"
-lazy-regex = "3.6.0"
-toml_edit = "0.25.4+spec-1.1.0"
-strings = { path = "crates/strings" }
+terminal.path = "crates/terminal"
+args.path = "crates/args"
+prelude.path = "crates/prelude"
+command-loader.path = "crates/command-loader"
+lexer.path = "language/frontend/lexer"
+syntax.path = "language/syntax"
+owo-colors.version = "4.3.0"
+colorchoice.version = "1.0.4"
+lazy-regex.version = "3.6.0"
+toml_edit.version = "0.25.4+spec-1.1.0"

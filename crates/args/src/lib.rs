@@ -11,7 +11,7 @@ pub struct ParsedArgs {
 impl ParsedArgs {
     pub fn parse() -> Self {
         let mut args = std::env::args()
-            .skip(1)              // Ignore self argument.
+            .skip(1)              // Ignore exe path.
             .take(256);           // Just in case.
         let subcommand = args.next();
         ParsedArgs {

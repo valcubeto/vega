@@ -19,8 +19,16 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 name = "command-loader"
 version = "0.1.0"
 dependencies = [
- "strings",
+ "prelude",
  "terminal",
+]
+
+[[package]]
+name = "lexer"
+version = "0.1.0"
+dependencies = [
+ "prelude",
+ "syntax",
 ]
 
 [[package]]
@@ -30,7 +38,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d211803b9b6b570f68772237e415a029d5a50c65d382910b879fb19d3271f94d"
 
 [[package]]
-name = "strings"
+name = "prelude"
+version = "0.1.0"
+dependencies = [
+ "terminal",
+]
+
+[[package]]
+name = "syntax"
 version = "0.1.0"
 
 [[package]]
@@ -46,10 +61,13 @@ version = "0.1.0"
 dependencies = [
  "args",
  "command-loader",
- "strings",
+ "prelude",
  "terminal",
 ]
 
 [[package]]
 name = "vega-run"
 version = "0.1.0"
+dependencies = [
+ "prelude",
+]

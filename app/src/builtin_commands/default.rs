@@ -1,4 +1,4 @@
-use strings::{ NAME_CAPITALIZED, NAME };
+use prelude::strings::{ NAME_CAPITALIZED, NAME };
 
 pub fn print_default() {
     println!("The utility manager for the {NAME_CAPITALIZED} programming language.");

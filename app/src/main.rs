@@ -1,14 +1,14 @@
 mod tests;
 mod builtin_commands;
 
-use terminal::{debug, fatal};
+use prelude::*;
+use terminal::*;
 use args::ParsedArgs;
 #[cfg(debug_assertions)]
-use strings::{ NAME, VERSION };
+use strings::{ NAME_CAPITALIZED, VERSION };
 
 fn main() {
-    debug!("Running {NAME} v{VERSION}.");
-    terminal::syntax_err!("hello");
+    debug!("Running {NAME_CAPITALIZED} v{VERSION}.");
 
     #[allow(unused)]
     let mut args = ParsedArgs::parse();
