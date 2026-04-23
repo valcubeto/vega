@@ -1,21 +1,8 @@
-use crate::flags::{ FromArgs, RawArgs };
-
 #[allow(dead_code)]
 #[cfg_attr(debug_assertions, derive(Debug))]
 pub struct ProgramOptions {
     pub verbosity: Verbosity,
     pub colors: Coloring,
-}
-
-// TODO: Vec::drain_filter to remove flags
-// TODO: use the chrono
-impl FromArgs for ProgramOptions {
-    fn from_args(_args: &mut RawArgs) -> Self {
-        ProgramOptions {
-            verbosity: Verbosity::default(),
-            colors: Coloring::Disabled
-        }
-    }
 }
 
 #[allow(dead_code)]

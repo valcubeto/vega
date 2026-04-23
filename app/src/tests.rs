@@ -1,8 +1,9 @@
 #![allow(dead_code, unused)]
 
+use prelude::terminal::*;
+
 #[test]
 fn debugging() {
-    use terminal::debug;
 
     debug!("A nice message");
 

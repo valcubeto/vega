@@ -1,0 +1,5 @@
+def MESSAGE = "Hello"
+
+fun main() {
+    println(MESSAGE)
+}

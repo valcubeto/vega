@@ -4,7 +4,6 @@ edition.workspace = true
 version.workspace = true
 
 [dependencies]
-terminal.workspace = true
+prelude.workspace = true
 args.workspace = true
 command-loader.workspace = true
-prelude.workspace = true

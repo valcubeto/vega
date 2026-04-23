@@ -1,32 +1,25 @@
+use std::num::NonZero;
 
+use prelude::types::*;
+use prelude::terminal::*;
+
+// Flag: "--" | "--" ("no-")? (long) (=value)? | '-' (short)+
 #[allow(clippy::while_let_on_iterator)]
-pub fn drain_flags(args: &RawArgs, candidates: Flags) -> (Vec<String>, Vec<FlagValue>) {
+pub fn drain_flags(args: SliceView<Str>, candidates: SliceView<Flag>) -> (Slice<Str>, Slice<ParsedFlagValue>) {
     let mut args_iter = args.iter().enumerate();
     let mut positionals = vec![];
     let mut flags = vec![];
 
-    // Avoid that implicit call to into_iter.
     while let Some((i, arg)) = args_iter.next() {
-        if arg == "--" {
+        if arg.as_ref() == "--" {
             break;
         }
-        if let Some(long_flag) = arg.strip_prefix("--") {
-            if let Some(flag) = candidates.iter().find(|flag| long_flag.starts_with(&flag.long)) {
-                flags.push(match flag.takes {
-                    PossibleFlagValue::Disables => FlagValue::False,
-                    PossibleFlagValue::Enables  => FlagValue::True,
-                    PossibleFlagValue::String   => {
-                        match long_flag.as_bytes().get(flag.long.len()) {
-                            Some(b'=') => FlagValue::String(
-                                long_flag[..flag.long.len() + 1].to_string()
-                            ),
-                            None => FlagValue::String(
-                                args_iter.next().expect("flag requires a value").1.clone()
-                            ),
-                            Some(_) => panic!("unknown flag")
-                        }
-                    }
-                });
+        // flag starts with "no-"
+        if let Some(flag) = arg.strip_prefix("--") {
+            let (disabled, flag) = arg.strip_prefix("no-")
+                .map_or((false, flag), |flag| (true, flag));
+            if let Some(cand) = candidates.iter().find(|cand| flag.starts_with(&cand.long)) {
+                let Some(x) = flag.split_once('=') else { panic!() };
             }
             continue;
         }
@@ -44,44 +37,39 @@ pub fn drain_flags(args: &RawArgs, candidates: Flags) -> (Vec<String>, Vec<FlagV
     while let Some((_i, arg)) = args_iter.next() {
         positionals.push(arg.clone())
     }
-    (positionals, flags)
+    (positionals.into_boxed_slice(), flags.into_boxed_slice())
 }
 
-pub trait FromArgs {
-    fn from_args(args: &mut RawArgs) -> Self;
-}
-
-pub type RawArgs = [String];
-
-pub type Flags<'a> = &'a [PossibleFlag];
-
-#[allow(dead_code)]
-#[cfg_attr(debug_assertions, derive(Debug))]
-pub struct PossibleFlag {
-    long: String,
-    short: Option<char>,
-    takes: PossibleFlagValue
-}
-
-#[allow(dead_code)]
-#[cfg_attr(debug_assertions, derive(Debug))]
-pub enum PossibleFlagValue {
-    Disables,
-    Enables,
-    String
-}
+// pub trait FromArgs {
+//     fn from_args(args: &mut RawArgs) -> Self;
+// }
 
 #[allow(dead_code)]
 #[cfg_attr(debug_assertions, derive(Debug))]
 pub struct Flag {
-    name: String,
-    value: FlagValue
+    long : String,
+    short: Option<NonZero<char>>,
+    expected_val: FlagValue
 }
 
 #[allow(dead_code)]
 #[cfg_attr(debug_assertions, derive(Debug))]
 pub enum FlagValue {
-    False,
-    True,
-    String(String)
+    Boolean,
+    String
+}
+
+#[allow(dead_code)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+pub struct ParsedFlag {
+    name: String,
+    value: ParsedFlagValue,
+}
+
+#[allow(dead_code)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+pub enum ParsedFlagValue {
+    Disabled,
+    Enabled,
+    String(Str)
 }

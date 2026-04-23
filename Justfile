@@ -1,7 +1,7 @@
 set shell := ["bash", "-c"]
 
 default:
-	@ just --list --unsorted
+	@ just --list
 
 tree:
 	#!/bin/env bash
@@ -19,24 +19,22 @@ tree:
 test:
 	cargo nextest run --no-capture --release
 
-test-debug:
+test-dev:
 	cargo nextest run --no-capture
 
 build:
 	@ cargo build --release
 
-vega-debug *args='':
+vega-dev *args='':
 	#!/bin/env bash
 	# Possible errors and warnings are
 	# printed again by `cargo run`.
 	cargo build --quiet > "/dev/null"
 	VEGA_HOME="./out" PATH="target/debug:$PATH" cargo run --bin=vega --quiet -- {{args}}
 
-alias vega-dbg := vega-debug
-
-# This command just keeps growing...
 vega *args='':
 	#!/bin/env bash
+	# This command just keeps growing...
 	cargo build --release --quiet > "/dev/null"
 	VEGA_HOME="$PWD/out" PATH="target/release:$PATH" cargo run --bin=vega --release --quiet -- {{args}}
 
@@ -65,11 +63,11 @@ add dep _preposition='' crate='':
 	test -z "{{crate}}" && exit 0
 	test -d "crates/{{crate}}" \
 		|| fatal "There's no \"{{crate}}\" crate."
-	echo "{{dep}} = { workspace = true }" \
+	echo "{{dep}}.workspace = true" \
 		>> "crates/{{crate}}/Cargo.toml"
 	echo "Also added opt-in to the {{crate}} crate's manifest."
 
-new crate:
+new-crate crate:
 	#!/bin/env bash
 	set -e
 	fatal() {
@@ -86,9 +84,8 @@ new crate:
 	echo '{{crate}}.path = "crates/{{crate}}"' \
 		>> "Cargo.toml"
 
-new-command name:
+subcommand name:
 	#!/bin/env bash
 	cd commands
-	cargo new {{name}} --bin
-
-alias new-cmd := new-command
+	name={{name}}
+	cargo new vega-"${name#vega-}" --bin

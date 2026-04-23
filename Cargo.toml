@@ -17,6 +17,7 @@ repository = "https://github.com/valcubeto/vega"
 readme = "README.md"
 
 [workspace.dependencies]
+# Local
 vega.path = "app"
 terminal.path = "crates/terminal"
 args.path = "crates/args"
@@ -24,7 +25,17 @@ prelude.path = "crates/prelude"
 command-loader.path = "crates/command-loader"
 lexer.path = "language/frontend/lexer"
 syntax.path = "language/syntax"
+# Terminal
+crossterm = "0.29.0"
 owo-colors.version = "4.3.0"
-colorchoice.version = "1.0.4"
+# String manipulation
 lazy-regex.version = "3.6.0"
 toml_edit.version = "0.25.4+spec-1.1.0"
+# Data structures
+smallvec = "2.0.0-alpha.12"
+indexmap = "2.14.0"
+hashbrown = "0.17.0"
+# Async
+tokio = "1.52.1"
+# Other
+rand = "0.10.1"

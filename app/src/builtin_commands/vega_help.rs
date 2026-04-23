@@ -1,4 +1,4 @@
-use terminal::debug;
+use prelude::terminal::debug;
 use prelude::strings::NAME_CAPITALIZED;
 
 pub fn print_help() {

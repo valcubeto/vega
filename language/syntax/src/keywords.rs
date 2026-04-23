@@ -24,7 +24,6 @@ macro_rules! keywords {
 }
 
 keywords! {
-    IncludeFile = "include";
     InlineMacro = "def";
     Macro = "macro";
     TypeDef = "type";
@@ -34,23 +33,27 @@ keywords! {
     Alias       = "as";
     TypeMatches = "is";
 
+    Module = "mod";
     Import = "use";
+    // "include" is a macro
+
     Public = "public";
 
     Generator = "gen";
 
     Async = "async";
-    Await = "await";
+    // await is special, it's more like a suffix operator
+    // Await = "await";
 
     If   = "if";
     Else = "else";
 
     Match = "match";
 
+    Loop  = "loop";
+    While = "while";
     For   = "for";
     ForIn = "in";
-
-    While = "while";
 
     With = "with";
 
@@ -62,10 +65,15 @@ keywords! {
 
     ConstGlobal = "const";
     MutGlobal   = "state";
+
     ConstLocal  = "let";
     MutLocal    = "var";
-    Function    = "fun";
-    Struct      = "struct";
-    Enum        = "enum";
-    Interface   = "interface";
+
+    Struct    = "struct";
+    Enum      = "enum";
+    Interface = "interface";
+
+    Function = "fun";
+
+    Where = "where";
 }

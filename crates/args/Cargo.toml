@@ -4,4 +4,5 @@ edition.workspace = true
 version.workspace = true
 
 [dependencies]
-colorchoice.workspace = true
+prelude.workspace = true
+hashbrown.workspace = true

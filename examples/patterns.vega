@@ -1,0 +1,15 @@
+enum Shape {
+    struct Rectangle : Self {
+        width : Int32
+        height: Int32
+    }
+    struct Triangle : Self {
+        base: Int32
+    }
+}
+
+fun main() {
+    if shape is Rectangle as (w, h) {
+        debug!(w, h)
+    }
+}

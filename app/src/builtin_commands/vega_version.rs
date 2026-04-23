@@ -1,4 +1,4 @@
-use terminal::debug;
+use prelude::terminal::debug;
 use prelude::strings::{ NAME, VERSION };
 
 pub fn print_version() {

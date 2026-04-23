@@ -1,7 +1,7 @@
-use args::flags::RawArgs;
-use terminal::debug;
+use prelude::types::*;
+use prelude::terminal::*;
 
-pub fn init_project(args: &RawArgs) {
+pub fn init_project(args: SliceView<Str>) {
     debug!("Initializing project with args {args:?}");
     todo!();
 }
