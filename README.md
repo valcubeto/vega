@@ -6,37 +6,53 @@ I will document properly after adding functionality.
 # Quick docs
 Types:
 - Numbers: `Integer`, `Decimal`
-- Fixed-size integers: `Int8`, `Int16`, `Int32`, `Int64`
-- Fixed-size unsigned integers: `UInt8`, `UInt16`, `UInt32`, `UInt64`
-- System-defined size numbers: `Size`, `Offset`
-- Floats: `Float32`, `Float64`
+- Fixed-size integers: `I8`, `I16`, `I32`, `I64`, `U8`, `U16`, `U32`, `U64`
+- Pointer size numbers: `Size`, `Offset`
+- Floats: `F32`, `F64`
 - Text: `Char`, `String`
 - Lists: `Slice` (fixed-size), `Array` (extensible), `Set`, tuples
 - Collections: `Map`, `Dict`
 
 Static variables:
-```crystal
+```
 const VERSION: String = "0.1.0"
-state COUNTER: UInt8 = 0
+state COUNTER: U8 = 0
 ```
 
 Functions:
-```crystal
-// Optional args and return type
-fun main(args: Args) -> Nothing {
-    let closure = take x, y do x + y
+```
+fun main() {
+    println("Hello, world!")
+}
+```
+
+Structs:
+```
+struct Point {
+    x: Integer
+    y: Integer
+
+    fun Self::static_member() {
+        println("Point::static_member")
+    }
+
+    fun otherside() -> Self {
+        Point { x = -self.x, y = -self.y }
+    }
+}
+
+let point = Point { x = 5, y = -11 }
 ```
 
 Interfaces:
-```crystal
-interface Indent {
-    fun indent(self, n: Size) -> Self
+```
+interface ToString {
+    fun to_string() -> String
 }
 
-impl Indent for String {
-    fun indent(self, n: Size = 1) -> Self {
-        self.map_lines((line) => "    ".repeat(n) + line)
-            .collect()
+impl ToString for Point {
+    fun to_string() {
+        f"({self.x}, {self.y})"
     }
 }
 ```
