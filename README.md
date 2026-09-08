@@ -1,7 +1,7 @@
 # The Vega programming language.
 I will document properly after adding functionality.
 
-At the moment this program does nothing.
+**PLEASE SEE OTHER BRANCHES**
 
 # Quick docs
 Types:
