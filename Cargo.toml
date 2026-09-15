@@ -8,3 +8,4 @@ debug = "line-tables-only"
 
 [dependencies]
 bumpalo = { version = "3.20.3", features = ["collections"] }
+crossterm = "0.29.0"
