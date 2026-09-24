@@ -7,5 +7,8 @@ edition = "2024"
 debug = "line-tables-only"
 
 [dependencies]
+bigdecimal = "0.4.10"
 bumpalo = { version = "3.20.3", features = ["collections"] }
 crossterm = "0.29.0"
+hashbrown = "0.17.1"
+num-bigint = "0.5.1"
