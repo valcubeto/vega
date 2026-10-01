@@ -1,31 +1,31 @@
 mod tokens; pub use tokens::*;
+mod display;
 #[cfg(debug_assertions)]
 mod debug;
-mod display;
 
-use crate::{ strings::StringRegistry, keywords::Keyword, error::* };
+use crate::{ keywords::Keyword, error::*, runtime::Runtime };
 use std::{ path::Path, str::Chars, iter::Peekable, fmt };
 
-pub struct Lexer<'a, 's> {
+pub struct Lexer<'a, 'rt> {
     file: &'a Path,
     data: &'a str,
     iter: Peekable<Chars<'a>>,
     idx: usize,
-    strings: &'s StringRegistry,
+    rt: &'rt mut Runtime<'rt>,
 }
 
-impl<'a, 's> Lexer<'a, 's> {
-    pub fn new(file: &'a Path, data: &'a str, strings: &'s StringRegistry) -> Self {
+impl<'a, 'rt> Lexer<'a, 'rt> {
+    pub fn new(file: &'a Path, data: &'a str, rt: &'rt mut Runtime<'rt>) -> Self {
         Lexer {
             file,
             data,
             idx: 0,
             iter: data.chars().peekable(),
-            strings,
+            rt,
         }
     }
 
-    pub fn lex(mut self) -> Result<'a, Box<[Token<'s>]>> {
+    pub fn lex(mut self) -> Result<'a, Box<[Token<'rt>]>> {
         use TokenKind as K;
         let mut tokens = Vec::new();
 
@@ -129,13 +129,13 @@ impl<'a, 's> Lexer<'a, 's> {
         }
     }
 
-    fn collect_word(&mut self, ch0: char) -> &'s str {
+    fn collect_word(&mut self, ch0: char) -> &'rt str {
         let start = self.idx - ch0.len_utf8();
         while self.next_if(is_valid_word_char) {}
-        self.strings.push_str(&self.data[start..self.idx])
+        self.rt.heap_str(&self.data[start..self.idx])
     }
 
-    fn collect_string(&mut self) -> Result<'a, &'s str> {
+    fn collect_string(&mut self) -> Result<'a, &'_ str> {
         let start = self.idx;
         let mut parsed = String::new();
         while let Some(ch) = self.next() && ch != '"' {
@@ -161,7 +161,7 @@ impl<'a, 's> Lexer<'a, 's> {
         let string =
             if parsed.capacity() != 0 { parsed.as_str() }
             else { &self.data[start..self.idx - 1] };
-        Ok(self.strings.push_str(string))
+        Ok(self.rt.heap_str(string))
     }
 
     fn collect_char(&mut self) -> Result<'a, char> {
@@ -200,7 +200,7 @@ impl<'a, 's> Lexer<'a, 's> {
         }
     }
 
-    fn collect_num(&mut self) -> Result<'a, TokenKind<'s>> {
+    fn collect_num(&mut self) -> Result<'a, TokenKind<'rt>> {
         let start = self.idx - 1;
         let mut num = String::from(&self.data[start..self.idx]);
         while let Some(ch) = self.peek() {
@@ -217,7 +217,8 @@ impl<'a, 's> Lexer<'a, 's> {
                 break;
             }
         }
-        Ok(TokenKind::Integer(num.into_boxed_str()))
+        let mut rt: &'rt &'rt mut Runtime<'rt>  = &self.rt;
+        Ok(TokenKind::Integer(rt.heap_str(num.as_str())))
     }
 }
 

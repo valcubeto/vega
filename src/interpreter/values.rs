@@ -5,15 +5,15 @@ use bigdecimal::{ BigDecimal, BigDecimalRef };
 
 #[allow(dead_code)]
 #[derive(Clone, Copy)]
-pub enum Value<'s, 'h> where 'h: 's {
+pub enum Value<'rt> {
     Unit,
-    Ident(&'s str),
-    String(&'h str),
-    Integer(&'h BigInt),
-    Decimal(BigDecimalRef<'h>),
+    Ident(&'rt str),
+    String(&'rt str),
+    Integer(&'rt BigInt),
+    Decimal(BigDecimalRef<'rt>),
 }
 
-impl<'s, 'h> fmt::Display for Value<'s, 'h> {
+impl fmt::Display for Value<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Value::Unit => write!(f, "()"),

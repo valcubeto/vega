@@ -2,52 +2,52 @@ use super::Op;
 #[cfg(debug_assertions)]
 use {
     std::fmt,
-    crossterm::style::Stylize
+    crossterm::style::Stylize,
 };
 
 use num_bigint::BigInt;
 use bigdecimal::BigDecimalRef;
 
-pub struct Expr<'s, 'h> {
-    pub kind: ExprKind<'s, 'h>,
+pub struct Expr<'s> {
+    pub kind: ExprKind<'s>,
 }
 
 #[allow(dead_code)]
-pub enum ExprKind<'s, 'h> {
+pub enum ExprKind<'s> {
     Ident(&'s str),
     String(&'s str),
     Integer(&'h BigInt),
     Decimal(BigDecimalRef<'h>),
     UnaryOp {
         op: Op,
-        value: Box<Expr<'s, 'h>>,
+        value: Box<Expr<'s>>,
     },
     BinaryOp {
         op: Op,
-        lhs: Box<Expr<'s, 'h>>,
-        rhs: Box<Expr<'s, 'h>>,
+        lhs: Box<Expr<'s>>,
+        rhs: Box<Expr<'s>>,
     },
     Call {
-        lhs: Box<Expr<'s, 'h>>,
-        args: Box<[Expr<'s, 'h>]>,
+        lhs: Box<Expr<'s>>,
+        args: Box<[Expr<'s>]>,
     },
     Index {
-        lhs: Box<Expr<'s, 'h>>,
-        idx: Box<Expr<'s, 'h>>,
+        lhs: Box<Expr<'s>>,
+        idx: Box<Expr<'s>>,
     },
     Construct {
-        lhs: Box<Expr<'s, 'h>>,
-        fields: Box<[Expr<'s, 'h>]>
+        lhs: Box<Expr<'s>>,
+        fields: Box<[Expr<'s>]>
     },
     If {
-        condition: Box<Expr<'s, 'h>>,
-        body: Box<[Expr<'s, 'h>]>,
-        else_block: Box<[Expr<'s, 'h>]>,
+        condition: Box<Expr<'s>>,
+        body: Box<[Expr<'s>]>,
+        else_block: Box<[Expr<'s>]>,
     },
 }
 
 #[cfg(debug_assertions)]
-impl<'s, 'h> fmt::Debug for Expr<'s, 'h> {
+impl<'s> fmt::Debug for Expr<'s> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self.kind {
             ExprKind::Ident(ident) => write!(f, "{}", ident.underlined()),

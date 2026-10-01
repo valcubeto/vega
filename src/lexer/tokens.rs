@@ -1,23 +1,23 @@
 use crate::{ keywords::Keyword, error::Marker };
 
-pub struct Token<'s> {
+pub struct Token<'rt> {
     pub pos: Marker,
-    pub kind: TokenKind<'s>
+    pub kind: TokenKind<'rt>
 }
 
 #[allow(dead_code)]
 #[derive(PartialEq, Eq)]
-pub enum TokenKind<'s> {
+pub enum TokenKind<'rt> {
     // This is to avoid that uninit bug.
     Dummy,
     // LITERALS (kinda)
     Keyword(Keyword),
-    Word(&'s str),
-    RawString(&'s str),
-    String(&'s str),
+    Word(&'rt str),
+    RawString(&'rt str),
+    String(&'rt str),
     Char(char),
-    Integer(Box<str>),
-    Decimal(Box<str>),
+    Integer(&'rt str),
+    Decimal(&'rt str),
 
     // PUNCTUATION
     NewLine,
@@ -40,18 +40,8 @@ pub enum TokenKind<'s> {
     LBracket, RBracket,
 }
 
-impl<'s> TokenKind<'s> {
-    pub fn at(self, start: usize, end: usize) -> Token<'s> {
+impl<'rt> TokenKind<'rt> {
+    pub fn at(self, start: usize, end: usize) -> Token<'rt> {
         Token { pos: Marker::Span(start, end), kind: self }
     }
-
-    // Get binding PAWA!!
-    // pub fn bp(self) -> Option<BindingPower> {
-    //     let (lbp, rbp) = match self {
-    //         Self::LParen | Self::LBracket | Self::LBrace => (100, 101),
-    //         // Not every token has PAWA...
-    //         _ => return None
-    //     };
-    //     Some(BindingPower { lbp, rbp })
-    // }
 }

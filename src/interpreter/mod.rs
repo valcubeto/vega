@@ -1,6 +1,5 @@
 mod values; pub use values::*;
-mod runtime; pub use runtime::*;
-use crate::{ parser::{ Expr, ExprKind, Op }, error::*, };
+use crate::{ runtime::Runtime, parser::{ Expr, ExprKind, Op }, error::*, };
 use std::{ path::Path, slice::Iter };
 
 pub struct Interpreter<'a, 's, 'n, 'h> {
@@ -17,7 +16,7 @@ where
     // 's: 'a,
     // 'n: 'a,
 {
-    pub fn new(file: &'a Path, rt: &'h mut Runtime<'s, 'h>, ast: &'n [Expr<'s>]) -> Self {
+    pub fn new(file: &'a Path, ast: &'n [Expr<'s>], rt: &'h mut Runtime<'s, 'h>) -> Self {
         Interpreter {
             file,
             rt,
