@@ -3,29 +3,33 @@ mod display;
 #[cfg(debug_assertions)]
 mod debug;
 
-use crate::{ keywords::Keyword, error::*, runtime::Runtime };
-use std::{ path::Path, str::Chars, iter::Peekable, fmt };
+use crate::common::*;
 
-pub struct Lexer<'a, 'rt> {
+use crate::{
+    keywords::Keyword,
+};
+use std::{ str::Chars, iter::Peekable, };
+
+pub struct Lexer<'a> {
     file: &'a Path,
-    data: &'a str,
+    source: &'a str,
+    data: TextContainer,
     iter: Peekable<Chars<'a>>,
     idx: usize,
-    rt: &'rt mut Runtime<'rt>,
 }
 
-impl<'a, 'rt> Lexer<'a, 'rt> {
-    pub fn new(file: &'a Path, data: &'a str, rt: &'rt mut Runtime<'rt>) -> Self {
+impl<'a> Lexer<'a> {
+    pub fn new(file: &'a Path, source: &'a str) -> Self {
         Lexer {
             file,
-            data,
+            source,
+            data: TextContainer::with_capacity(source.len() / 4 * 3),
             idx: 0,
-            iter: data.chars().peekable(),
-            rt,
+            iter: source.chars().peekable(),
         }
     }
 
-    pub fn lex(mut self) -> Result<'a, Box<[Token<'rt>]>> {
+    pub fn lex<'t>(mut self) -> crate::vega::Result<Box<[Token<'t>]>> {
         use TokenKind as K;
         let mut tokens = Vec::new();
 
@@ -86,20 +90,20 @@ impl<'a, 'rt> Lexer<'a, 'rt> {
         Ok(tokens.into_boxed_slice())
     }
 
-    fn error(&self, message: impl fmt::Display, pos: Marker) -> Error<'a> {
-        Error {
-            kind: ErrorKind::SyntaxError,
+    fn error(&self, message: impl fmt::Display, pos: Marker) -> vega::Error {
+        vega::Error {
+            kind: vega::ErrorKind::SyntaxError,
             message: message.to_string().into_boxed_str(),
-            file: self.file,
+            file: self.file.to_path_buf(),
             pos,
         }
     }
 
-    fn todo(&self, message: impl fmt::Display, pos: Marker) -> Error<'a> {
-        Error {
-            kind: ErrorKind::NotYetImplemented,
+    fn todo(&self, message: impl fmt::Display, pos: Marker) -> vega::Error {
+        vega::Error {
+            kind: vega::ErrorKind::NotYetImplemented,
             message: message.to_string().into_boxed_str(),
-            file: self.file,
+            file: self.file.to_path_buf(),
             pos,
         }
     }
@@ -122,20 +126,20 @@ impl<'a, 'rt> Lexer<'a, 'rt> {
         cond
     }
 
-    fn expect(&mut self, test: fn (char) -> bool) -> Result<'a, char> {
+    fn expect(&mut self, test: fn (char) -> bool) -> vega::Result<char> {
         match self.next() {
             Some(ch) if test(ch) => Ok(ch),
             _ => Err(self.error("unexpected character", Marker::Char(self.idx)))
         }
     }
 
-    fn collect_word(&mut self, ch0: char) -> &'rt str {
+    fn collect_word(&mut self, ch0: char) -> &str {
         let start = self.idx - ch0.len_utf8();
         while self.next_if(is_valid_word_char) {}
-        self.rt.heap_str(&self.data[start..self.idx])
+        self.data.push_str(&self.source[start..self.idx])
     }
 
-    fn collect_string(&mut self) -> Result<'a, &'_ str> {
+    fn collect_string(&mut self) -> vega::Result<&'_ str> {
         let start = self.idx;
         let mut parsed = String::new();
         while let Some(ch) = self.next() && ch != '"' {
@@ -147,7 +151,7 @@ impl<'a, 'rt> Lexer<'a, 'rt> {
                 '\\' => {
                     let ch = self.get_escape_sequence()?;
                     if parsed.capacity() == 0 {
-                        parsed.push_str(&self.data[start..self.idx - 1]);
+                        parsed.push_str(&self.source[start..self.idx - 1]);
                     }
                     parsed.push(ch);
                 }
@@ -160,11 +164,11 @@ impl<'a, 'rt> Lexer<'a, 'rt> {
         }
         let string =
             if parsed.capacity() != 0 { parsed.as_str() }
-            else { &self.data[start..self.idx - 1] };
-        Ok(self.rt.heap_str(string))
+            else { &self.source[start..self.idx - 1] };
+        Ok(self.data.push_str(string))
     }
 
-    fn collect_char(&mut self) -> Result<'a, char> {
+    fn collect_char(&mut self) -> vega::Result<char> {
         let ch = match self.next() {
             None => {
                 return Err(self.error("expected a character", Marker::Char(self.idx)));
@@ -180,7 +184,7 @@ impl<'a, 'rt> Lexer<'a, 'rt> {
     }
 
     /// Return escape sequence after seeing a backslash inside a string or char
-    fn get_escape_sequence(&mut self) -> Result<'a, char> {
+    fn get_escape_sequence(&mut self) -> vega::Result<char> {
         let start = self.idx - 1;
         match self.next() {
             None | Some('\n') => Err(self.error("unfinished escape sequence", Marker::Span(start, self.idx))),
@@ -200,9 +204,9 @@ impl<'a, 'rt> Lexer<'a, 'rt> {
         }
     }
 
-    fn collect_num(&mut self) -> Result<'a, TokenKind<'rt>> {
+    fn collect_num(&mut self) -> vega::Result<TokenKind<'_>> {
         let start = self.idx - 1;
-        let mut num = String::from(&self.data[start..self.idx]);
+        let mut num = String::from(&self.source[start..self.idx]);
         while let Some(ch) = self.peek() {
             if ch.is_ascii_digit() {
                 let _ = self.next();
@@ -217,8 +221,7 @@ impl<'a, 'rt> Lexer<'a, 'rt> {
                 break;
             }
         }
-        let mut rt: &'rt &'rt mut Runtime<'rt>  = &self.rt;
-        Ok(TokenKind::Integer(rt.heap_str(num.as_str())))
+        Ok(TokenKind::Integer(self.data.push_str(num.as_str())))
     }
 }
 

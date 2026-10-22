@@ -1,0 +1,104 @@
+fun main() {
+	var ctx = Context::new()
+
+	loop {
+	    print_prompt()
+	    let input = readln()
+	    let result = ctx.eval(input)
+	    println(result.pretty_display())
+	}
+}
+
+struct Context {
+	rt: Runtime
+
+	fun new() -> Self =
+		Context {
+			rt = Runtime::new()
+		}
+
+	fun &self.eval(input: String) {
+		let tokens = lex(input)
+		let ast = parse(tokens)
+		JIT { ir = ast }.run()
+	}
+}
+
+fun lex(input: $Box<str>) -> ${
+	//                   ptr to array of bytes representing string data
+	//                   Vec::append(&mut self, &mut Self)
+	text = TextStorage { Box<[u8]> },
+	//                    ptr inside `text`
+	tokens = Box<[Token { &'t str }]>
+}
+
+struct Runtime {
+	env: #[ String => Value ]
+	stack: [RuntimeValue]
+	heap: Heap
+}
+
+struct Heap {
+    data: SlotMap<RuntimeValue>
+
+    fun &self.alloc(value: RuntimeValue) -> ValueId {
+        // data.get(id) data.get_mut(id) data.remove(id)
+        self.data.insert(value)
+    }
+}
+
+union RuntimeValue {
+    String($Box<str>)
+    Integer(BigInt)
+    Decimal(BigDecimal)
+}
+
+struct JIT {
+	ir: [Expr]
+
+	fun self.run() -> Value {}
+}
+
+union Value {
+	String { - String }
+	Number { - Number }
+	Fun    { - Function }
+	Module { - Module }
+
+	fun self.pretty_display() -> String { ... }
+}
+
+/*
+ * fun x<T>(a: B) -> T { a }
+ */
+
+struct Function {
+	name: Token
+	args: [TypeArgument]
+	generics: [TypeArgument]
+	output: Type
+	body: [Expr]
+}
+
+struct TypeArgument {
+	name: Token
+	expected: Type
+}
+
+struct Module {
+	members: #[ String => Value ]
+}
+
+struct Token {
+	pos: Position
+	kind: enum {
+		String  { - String  }
+		FString { - FString }
+	}
+}
+
+// 4 bytes, for a max of 65k cols and 65k lines
+struct Position {
+	- line: U16
+	- col:  U16
+}

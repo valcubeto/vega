@@ -1,12 +1,18 @@
-pub struct StringRegistry {
-    data: bumpalo::Bump
+pub struct TextContainer {
+    data: Vec<u8>
 }
 
-impl StringRegistry {
-    pub fn with_capacity(cap: usize) -> Self {
-        StringRegistry { data: bumpalo::Bump::with_capacity(cap) }
+impl TextContainer {
+    pub fn with_capacity(capacity: usize) -> Self {
+        TextContainer {
+            data: Vec::with_capacity(capacity)
+        }
     }
-    pub fn push_str(&self, string: &str) -> &str {
-        self.data.alloc_str(string)
+
+    pub fn push_str(&mut self, string: &str) -> &str {
+        self.data.extend_from_slice(string.as_bytes());
+        unsafe {
+            str::from_utf8_unchecked(&self.data[self.data.len() - string.len()..])
+        }
     }
 }

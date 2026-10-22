@@ -1,6 +1,10 @@
-mod values; pub use values::*;
-use crate::{ runtime::Runtime, parser::{ Expr, ExprKind, Op }, error::*, };
+mod runtime;
+mod values;
+use crate::{ parser::{ Expr, ExprKind, Op }, error::*, };
 use std::{ path::Path, slice::Iter };
+
+pub use runtime::Runtime;
+pub use values::Value;
 
 pub struct Interpreter<'a, 's, 'n, 'h> {
     pub file: &'a Path,

@@ -1,7 +1,7 @@
 mod ops; pub use ops::*;
 mod expr; pub use expr::*;
 
-use crate::{ lexer::{ Token, TokenKind }, error::* };
+use crate::{ lexer::{ Token, TokenKind }, vega::* };
 use std::{ iter::Peekable, slice::Iter, path::Path, fmt };
 
 #[allow(dead_code)]

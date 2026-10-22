@@ -1,23 +1,24 @@
-use crate::{ keywords::Keyword, error::Marker };
+use crate::common::*;
+use crate::{ keywords::Keyword, };
 
-pub struct Token<'rt> {
+pub struct Token<'t> {
     pub pos: Marker,
-    pub kind: TokenKind<'rt>
+    pub kind: TokenKind<'t>
 }
 
 #[allow(dead_code)]
 #[derive(PartialEq, Eq)]
-pub enum TokenKind<'rt> {
+pub enum TokenKind<'t> {
     // This is to avoid that uninit bug.
     Dummy,
     // LITERALS (kinda)
     Keyword(Keyword),
-    Word(&'rt str),
-    RawString(&'rt str),
-    String(&'rt str),
+    Word(&'t str),
+    RawString(&'t str),
+    String(&'t str),
     Char(char),
-    Integer(&'rt str),
-    Decimal(&'rt str),
+    Integer(&'t str),
+    Decimal(&'t str),
 
     // PUNCTUATION
     NewLine,
@@ -40,8 +41,11 @@ pub enum TokenKind<'rt> {
     LBracket, RBracket,
 }
 
-impl<'rt> TokenKind<'rt> {
-    pub fn at(self, start: usize, end: usize) -> Token<'rt> {
-        Token { pos: Marker::Span(start, end), kind: self }
+impl<'t> TokenKind<'t> {
+    pub fn at(self, start: usize, end: usize) -> Token<'t> {
+        Token {
+            pos: Marker::Span(start, end),
+            kind: self
+        }
     }
 }
