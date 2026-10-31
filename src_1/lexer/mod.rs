@@ -29,7 +29,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn lex<'t>(mut self) -> crate::vega::Result<Box<[Token<'t>]>> {
+    pub fn lex<'t>(mut self) -> crate::vega::Result<Box<[Token]>> {
         use TokenKind as K;
         let mut tokens = Vec::new();
 

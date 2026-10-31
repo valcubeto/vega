@@ -1,22 +1,26 @@
-pub use crate::{
-    strings::TextContainer,
-    lexer::Lexer,
-    parser::Parser,
-    vega::{
-        self,
-        Marker,
-    }
-    // interpreter::{ Interpreter, Value, Runtime },
+#[allow(unused_imports)]
+pub use {
+    std::{
+        io::{ self, Write },
+        fmt,
+        path::{ Path, PathBuf },
+        iter::Peekable,
+        str::Chars,
+        slice::Iter,
+    },
+    crossterm::style::Stylize,
+    hashbrown::HashMap,
+    anyhow::Context,
+    crate::{
+        text::interner::{ Interner, Symbol },
+        lex::types::tokens::*,
+    },
 };
 
-pub use std::{
-    path::{ Path, PathBuf },
-    process::exit,
-    io::{ self, Write },
-    fmt,
-};
-
-pub use crossterm::style::Stylize;
+pub struct Input {
+    pub source: Box<Path>,
+    pub data: Box<str>,
+}
 
 #[doc(hidden)]
 #[macro_use]

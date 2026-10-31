@@ -18,7 +18,7 @@ struct Context {
 		}
 
 	fun &self.eval(input: String) {
-		let tokens = lex(input)
+		let (text, tokens) = lex(input)
 		let ast = parse(tokens)
 		JIT { ir = ast }.run()
 	}
@@ -99,6 +99,6 @@ struct Token {
 
 // 4 bytes, for a max of 65k cols and 65k lines
 struct Position {
-	- line: U16
-	- col:  U16
+	line: U16
+	col:  U16
 }

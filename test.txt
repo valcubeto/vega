@@ -1,0 +1,20 @@
+use std::(
+    process::args::parsed_args
+    path::Path
+)
+
+#[parsed_args]
+struct Args (ParseArgs) {
+    #[short(), long()]
+    long_list: Boolean
+
+    #[short(), long()]
+    all: Boolean
+}
+
+fun main(args: Args) -> Result<(), any Error> {
+    for path in args.positionals() {
+        let path = Path::try_from(path)?
+        // aaaaaaaaaaaaaa
+    }
+}
