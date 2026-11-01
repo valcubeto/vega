@@ -1,4 +1,4 @@
-use super::types::{ tokens::*, keywords::Keyword };
+use super::types::{keywords::Keyword, tokens::*};
 use crate::common::*;
 
 pub struct Lexer<'a> {
@@ -26,7 +26,9 @@ impl<'a> Lexer<'a> {
         while let Some(ch) = self.next() {
             let token = match ch {
                 // Avoid repeated new lines:
-                '\n' if tokens.last().is_none_or(|prev| prev.kind != Kind::NewLine) => Kind::NewLine,
+                '\n' if tokens.last().is_none_or(|prev| prev.kind != Kind::NewLine) => {
+                    Kind::NewLine
+                }
                 ' ' | '\t' | '\r' | '\n' => {
                     start = self.idx;
                     continue;
@@ -93,7 +95,7 @@ impl<'a> Lexer<'a> {
 
     /// Advances the cursor if the next character matches the pattern.
     /// Returns whether it advanced the cursor or not.
-    fn skip_if(&mut self, patt: fn (char) -> bool) -> bool {
+    fn skip_if(&mut self, patt: fn(char) -> bool) -> bool {
         if self.peek().is_some_and(|ch| patt(ch)) {
             let _ = self.next();
             true
@@ -107,15 +109,15 @@ impl<'a> Lexer<'a> {
         &self.input.data[start as usize..end as usize]
     }
 
-    fn expect(&mut self, matches: fn (char) -> bool) -> anyhow::Result<char> {
-        if let Some(ch) = self.next() && matches(ch) {
-            Ok(ch)
-        } else {
-            None.context("unexpected character")
-        }
+    fn expect_with_msg(&mut self, matches: fn(char) -> bool, msg: &'static str) -> anyhow::Result<char> {
+        // Is this unreadable? Maybe
+        let ch = self.next().context("unexpected end of input")?;
+        matches(ch).then_some(ch).context(msg)
     }
 
-
+    fn expect(&mut self, matches: fn(char) -> bool) -> anyhow::Result<char> {
+        self.expect_with_msg(matches, "unexpected character")
+    }
 
     fn collect_word(&mut self, ch0: char) -> TokenKind {
         let start = self.idx - ch0.len_utf8() as u16;
@@ -125,16 +127,18 @@ impl<'a> Lexer<'a> {
         let word = self.input_slice(start, self.idx);
         // let word = &self.input.data[start as usize..self.idx as usize];
         if let Some(kw) = Keyword::from_str(word) {
-            TokenKind::Keyword (kw)
+            TokenKind::Keyword(kw)
         } else {
-            TokenKind::Word (self.interner.intern(word))
+            TokenKind::Word(self.interner.intern(word))
         }
     }
 
     fn collect_string(&mut self) -> anyhow::Result<Symbol> {
         let start = self.idx;
         let mut parsed = String::new();
-        while let Some(ch) = self.next() && ch != '"' {
+        while let Some(ch) = self.next()
+            && ch != '"'
+        {
             match ch {
                 '\n' => {
                     // TODO: new lines in strings, with indents
@@ -154,13 +158,11 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        Ok(
-            if parsed.capacity() != 0 {
-                self.interner.intern(parsed)
-            } else {
-                self.interner.intern(self.input_slice(start, self.idx - 1).to_owned())
-            }
-        )
+        Ok(if parsed.capacity() != 0 {
+            self.interner.intern(parsed)
+        } else {
+            self.interner.intern(self.input_slice(start, self.idx - 1))
+        })
     }
 
     fn collect_char(&mut self) -> anyhow::Result<char> {
@@ -172,9 +174,9 @@ impl<'a> Lexer<'a> {
                 return None.context("unfinished character");
             }
             Some('\\') => self.get_escape_sequence()?,
-            Some(ch) => ch
+            Some(ch) => ch,
         };
-        self.expect(|ch| ch == '\'')?;
+        self.expect_with_msg(|ch| ch == '\'', "expected character end (single quotes are for single characters)")?;
         Ok(ch)
     }
 
@@ -189,13 +191,23 @@ impl<'a> Lexer<'a> {
             Some('n') => Ok('\n'),
             Some('r') => Ok('\r'),
             Some('t') => Ok('\t'),
-            Some('u') => {
-                None.context("unicode escape sequences")
-            }
+            Some('u') => None.context("unicode escape sequences"),
             Some('x') => {
-                None.context("hex escape sequences")
+                let (hi, lo) = self.next().zip(self.next())
+                    .context("unexpected end of file, unfinished escape sequence")?;
+                let hi = hi.to_digit(16)
+                    .context("non hex character in hex sequence")? as u8;
+                let lo = lo.to_digit(16)
+                    .context("non hex character in hex sequence")? as u8;
+
+                let code = hi * 16 + lo;
+                if code > 0x7f {
+                    None.context("hex sequence out of range")
+                } else {
+                    Ok(char::from(code))
+                }
             }
-            Some(ch) => None.context(format!("invalid escape sequence \\{}", ch))
+            Some(ch) => None.context(format!("invalid escape sequence \\{ch}")),
         }
     }
 
@@ -216,7 +228,7 @@ impl<'a> Lexer<'a> {
                 break;
             }
         }
-        Ok(TokenKind::Integer (self.interner.intern(num)))
+        Ok(TokenKind::Integer(self.interner.intern(num)))
     }
 }
 

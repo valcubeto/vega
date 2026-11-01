@@ -20,7 +20,7 @@ struct Context {
 	fun &self.eval(input: String) {
 		let (text, tokens) = lex(input)
 		let ast = parse(tokens)
-		JIT { ir = ast }.run()
+		Interpreter { ir = ast }.run()
 	}
 }
 
@@ -53,7 +53,7 @@ union RuntimeValue {
     Decimal(BigDecimal)
 }
 
-struct JIT {
+struct Interpreter {
 	ir: [Expr]
 
 	fun self.run() -> Value {}

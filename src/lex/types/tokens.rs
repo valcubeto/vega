@@ -48,6 +48,12 @@ pub struct Position(
     pub u16
 );
 
+impl fmt::Display for Position {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}..{}", self.0, self.1)
+    }
+}
+
 impl TokenKind {
     pub fn at(self, pos: Position) -> Token {
         Token {
@@ -69,3 +75,24 @@ impl TokenKind {
 //         }
 //     }
 // }
+
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use TokenKind as Kind;
+        let repr = match self.kind {
+            Kind::Word(_) => "identifier",
+            Kind::Keyword(_) => "keyword",
+            Kind::String(_) => "string",
+            Kind::Char(_) => "character",
+            | Kind::Assign
+            | Kind::Equals
+            | Kind::Hyphen
+            | Kind::Plus => "operator",
+            // lazy programmer
+            | Kind::Comma
+            | Kind::Semicolon => "punctuation",
+            _ => "token",
+        };
+        write!(f, "{} (at {})", repr, self.pos)
+    }
+}

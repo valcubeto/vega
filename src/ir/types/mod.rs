@@ -1,3 +1,3 @@
 pub mod expr;
 pub mod values;
-mod ops;
+pub mod ops;

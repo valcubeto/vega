@@ -191,7 +191,7 @@ impl fmt::Debug for Op {
             Op::GetItem => "::",
             Op::GetProp => ".",
         };
-        write!(f, "{}", repr.magenta())
+        write!(f, "`{}`", repr.magenta())
     }
 }
 

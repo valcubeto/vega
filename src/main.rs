@@ -17,12 +17,13 @@ fn main() -> anyhow::Result<()> {
         data: Box::from(
             r#"
                 // Comment
-                println
-                '\r'
+                println + a
+                '\x7e'
                 "Hello, world!\e"
             "#
         )
     };
+    println!("(main) data = r#\"{}\"#", input.data);
 
     let (text, tokens) = Lexer::new(&input).lex()?;
 
@@ -38,7 +39,7 @@ fn main() -> anyhow::Result<()> {
     let statements = Parser::new(&input, tokens.as_ref()).make_ast()?;
 
     for stmt in statements.iter() {
-        println!("(main) stmt = {stmt:?}");
+        println!("(main) stmt = {stmt:#?}");
     }
 
     // let result = JIT::new(statements).eval_and_return_last()?;

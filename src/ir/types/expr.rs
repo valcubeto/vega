@@ -14,7 +14,7 @@ pub enum ExprKind {
     String(Symbol),
     UnaryOp {
         op: Op,
-        target: Box<Expr>,
+        value: Box<Expr>,
     },
     BinaryOp {
         op: Op,
