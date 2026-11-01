@@ -65,7 +65,8 @@ union Value {
 	Fun    { - Function }
 	Module { - Module }
 
-	fun self.pretty_display() -> String { ... }
+	impl Display:
+	    fun self.pretty_display() -> String { ... }
 }
 
 /*

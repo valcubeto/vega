@@ -25,23 +25,27 @@ impl<'a> Lexer<'a> {
         let mut start = 0;
         while let Some(ch) = self.next() {
             let token = match ch {
-                ' ' | '\t' | '\r' => continue,
-                // Avoid repeated new lines
-                '\n' if tokens.last().is_none_or(|tok| tok.kind != Kind::NewLine) => Kind::NewLine,
-                '\n' => continue,
-                ';'  => Kind::Semicolon,
-                ','  => Kind::Comma,
-                '('  => Kind::LParen,
-                ')'  => Kind::RParen,
-                '{'  => Kind::LBrace,
-                '}'  => Kind::RBrace,
-                '['  => Kind::LBracket,
-                ']'  => Kind::RBracket,
-                '+'  => Kind::Plus,
-                '-'  => Kind::Hyphen,
-                '*'  => Kind::Star,
+                // Avoid repeated new lines:
+                '\n' if tokens.last().is_none_or(|prev| prev.kind != Kind::NewLine) => Kind::NewLine,
+                ' ' | '\t' | '\r' | '\n' => {
+                    start = self.idx;
+                    continue;
+                }
+                ';' => Kind::Semicolon,
+                ',' => Kind::Comma,
+                '(' => Kind::LParen,
+                ')' => Kind::RParen,
+                '{' => Kind::LBrace,
+                '}' => Kind::RBrace,
+                '[' => Kind::LBracket,
+                ']' => Kind::RBracket,
+                '#' => Kind::Hash,
+                '+' => Kind::Plus,
+                '-' => Kind::Hyphen,
+                '*' => Kind::Star,
                 '=' if self.skip_if(|ch| ch == '=') => Kind::Equals,
                 '=' => Kind::Assign,
+                // Comments:
                 '/' if self.skip_if(|ch| ch == '/') => {
                     while let Some(ch) = self.next() {
                         if ch == '\n' {
@@ -53,17 +57,19 @@ impl<'a> Lexer<'a> {
                     }
                     continue;
                 }
+                // Regex:
+                // '/' => {},
                 '/' => Kind::Slash,
                 'r' if self.peek().is_some_and(|ch| ch == '"') => {
                     return None.context("todo: raw strings");
                 }
                 'f' if self.skip_if(|ch| ch == '"') => {
-                    return None.context("format strings");
+                    return None.context("todo: format strings");
                 }
                 '"' => Kind::String(self.collect_string()?),
+                '\'' => Kind::Char(self.collect_char()?),
                 ch if is_valid_word_start(ch) => self.collect_word(ch),
                 ch if ch.is_ascii_digit() => self.collect_num()?,
-                '\'' => Kind::Char(self.collect_char()?),
                 ch => {
                     return None.context(format!("unexpected character {ch:?} ({})", here!()));
                 }
@@ -77,7 +83,7 @@ impl<'a> Lexer<'a> {
 
     fn next(&mut self) -> Option<char> {
         let ch = self.data_iter.next()?;
-        self.idx += ch.len_utf8().min(0xffff) as u16;
+        self.idx += ch.len_utf8() as u16;
         Some(ch)
     }
 
@@ -135,11 +141,10 @@ impl<'a> Lexer<'a> {
                     return None.context("unexpected new line inside string");
                 }
                 '\\' => {
-                    let ch = self.get_escape_sequence()?;
                     if parsed.capacity() == 0 {
                         parsed.push_str(self.input_slice(start, self.idx - 1));
                     }
-                    parsed.push(ch);
+                    parsed.push(self.get_escape_sequence()?);
                 }
                 ch => {
                     if parsed.capacity() != 0 {
@@ -148,12 +153,14 @@ impl<'a> Lexer<'a> {
                 }
             }
         }
-        let string = if parsed.capacity() != 0 {
-            self.interner.intern(parsed)
-        } else {
-            self.interner.intern(self.input_slice(start, self.idx).to_owned())
-        };
-        Ok(string)
+
+        Ok(
+            if parsed.capacity() != 0 {
+                self.interner.intern(parsed)
+            } else {
+                self.interner.intern(self.input_slice(start, self.idx - 1).to_owned())
+            }
+        )
     }
 
     fn collect_char(&mut self) -> anyhow::Result<char> {

@@ -25,31 +25,35 @@ impl<'a> Parser<'a> {
     }
 
     pub fn make_ast(mut self) -> anyhow::Result<Box<[Expr]>> {
-        let mut statements = Vec::new();
+        let mut statements: Vec<Expr> = vec![];
 
         while let Some(token) = self.peek() {
-            if token.kind == TokenKind::NewLine {
+            if matches!(token.kind, TokenKind::NewLine | TokenKind::Semicolon) {
                 let _ = self.next();
                 continue;
             }
-            if let Some(stmt) = self.parse_expr()? {
+
+            const MIN_BP: u8 = 0;
+            if let Some(stmt) = self.parse_expr_bp(MIN_BP)? {
                 statements.push(stmt);
             }
+            // else {
+            //     None means end of file.
+            // }
         }
 
         Ok(statements.into_boxed_slice())
     }
 
-    pub fn parse_expr(&mut self) -> anyhow::Result<Option<Expr>> {
+    /// Parse an expression with binding powers.
+    pub fn parse_expr_bp(&mut self, mbp: u8) -> anyhow::Result<Option<Expr>> {
         let Some(token) = self.next() else { return Ok(None) };
-        let mut expr = match token.kind {
-            TokenKind::String(sym) => {
-                Expr {
-                    kind: ExprKind::String(sym)
-                }
-            }
+        let mut lhs = match token.kind {
+            TokenKind::Word(sym) => ExprKind::Ident(sym).at(token.pos),
+            TokenKind::String(sym) => ExprKind::String(sym).at(token.pos),
+            TokenKind::Char(ch) => ExprKind::Char(ch).at(token.pos),
             _ => todo!()
         };
-        Ok(Some(expr))
+        Ok(Some(lhs))
     }
 }

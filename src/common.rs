@@ -29,6 +29,15 @@ mod _macros {
     macro_rules! here {
         () => { format!("{}:{}:{}", file!(), line!(), column!()) };
     }
+
+    #[macro_export]
+    macro_rules! hashmap {
+        ($($key:expr => $value:expr),* $(,)?) => {
+            ::hashbrown::HashMap::from([
+                $( ($key.to_owned(), $value) ),*
+            ])
+        };
+    }
 }
 
-pub use here;
+pub use { here, hashmap };

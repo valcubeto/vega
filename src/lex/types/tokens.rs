@@ -30,6 +30,7 @@ pub enum TokenKind {
     RBrace,
     LBracket,
     RBracket,
+    Hash,
 
     Equals,
     Assign,

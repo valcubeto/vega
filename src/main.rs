@@ -4,6 +4,7 @@ mod common;
 mod text;
 mod lex;
 mod ir;
+mod interpreter;
 
 use common::*;
 
@@ -16,7 +17,9 @@ fn main() -> anyhow::Result<()> {
         data: Box::from(
             r#"
                 // Comment
-                "Hello, world!"
+                println
+                '\r'
+                "Hello, world!\e"
             "#
         )
     };
@@ -24,13 +27,18 @@ fn main() -> anyhow::Result<()> {
     let (text, tokens) = Lexer::new(&input).lex()?;
 
     for token in tokens.iter() {
-        println!("(main) token = {token:?}\n");
+        println!("(main) token = {token:?}");
+        if let TokenKind::String(sym) = token.kind {
+            println!("             = String({:?})", text.lookup(sym).unwrap());
+        }
     }
+
+    println!();
 
     let statements = Parser::new(&input, tokens.as_ref()).make_ast()?;
 
     for stmt in statements.iter() {
-        println!("(main) stmt = {stmt:?}\n");
+        println!("(main) stmt = {stmt:?}");
     }
 
     // let result = JIT::new(statements).eval_and_return_last()?;

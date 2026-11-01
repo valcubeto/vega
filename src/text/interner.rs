@@ -4,6 +4,7 @@ use crate::common::*;
 use string_interner::{ StringInterner as Interner_, DefaultBackend, DefaultSymbol };
 // use inturn::Interner as _Interner;
 
+/// An identifier for a unique string.
 pub type Symbol = DefaultSymbol;
 
 pub struct Interner {

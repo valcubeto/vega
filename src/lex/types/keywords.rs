@@ -38,6 +38,7 @@ keywords! {
     "async" => Async,
     "await" => Await,
     "gen" => Generator,
+    "unsafe" => Unsafe,
 
     // Declarations
     "const" => StaticConst,
@@ -47,8 +48,8 @@ keywords! {
     "fun" => Function,
     "struct" => Struct,
     "enum" => Enum,
-    "union" => Union,
-    "interface" => Interface,
+    "union" => TaggedUnion,
+    "class" => Interface,
     "type" => TypeAlias,
     "impl" => Implement,
 
@@ -65,7 +66,7 @@ keywords! {
     "while" => While,
     "for" => For,
     "in" => In,
-    "try" => TryBlock,
+
 
     // Ops
     "not" => Not,
@@ -73,4 +74,8 @@ keywords! {
     "or" => Or,
 
     // Other
+    "try" => TryBlock,
+    "defer" => DeferBlock,
+    "where" => Where,
+    "with" => With,
 }
