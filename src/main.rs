@@ -1,15 +1,16 @@
 #![allow(unused)] // Sometimes it gets annoying.
 
 mod common;
-mod text;
-mod lex;
-mod ir;
+mod errors;
 mod interpreter;
+mod ir;
+mod lex;
+mod text;
 
 use common::*;
 
-use lex::{ types::tokens::*, parsing::Lexer };
 use ir::parsing::Parser;
+use lex::{parsing::Lexer, types::tokens::*};
 
 fn main() -> anyhow::Result<()> {
     let input = Input {
@@ -20,8 +21,8 @@ fn main() -> anyhow::Result<()> {
                 a + b * c and d
                 '\x7e'
                 "Hello, world!\e"
-            "#
-        )
+            "#,
+        ),
     };
     println!("(main) data = r#\"{}\"#", input.data);
 
@@ -40,7 +41,7 @@ fn main() -> anyhow::Result<()> {
         Ok(statements) => statements,
         Err((pos, err)) => {
             for cause in err.chain() {
-                eprintln!("{cause:#?}");
+                eprintln!("{cause}");
             }
             let Position(start, end) = pos;
             let (li, co) = line_and_column(&input.data, start as usize);

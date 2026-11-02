@@ -1,46 +1,36 @@
 #[allow(unused_imports)]
 pub use {
-    std::{
-        io::{ self, Write },
-        fmt,
-        path::{ Path, PathBuf },
-        iter::Peekable,
-        str::Chars,
-        slice::Iter,
-        process::exit,
+    crate::{
+        lex::types::tokens::*,
+        text::interner::{Interner, Symbol},
+        errors::*,
     },
+    anyhow::Context,
     crossterm::style::Stylize,
     hashbrown::HashMap,
-    anyhow::Context,
-    crate::{
-        text::interner::{ Interner, Symbol },
-        lex::types::tokens::*,
+    std::{
+        fmt,
+        io::{self, Write},
+        iter::Peekable,
+        path::{Path, PathBuf},
+        process::exit,
+        slice::Iter,
+        str::Chars,
     },
 };
-
-pub type VegaResult<T> = Result<T, (Position, anyhow::Error)>;
-
-pub trait VegaMoreContext<T> {
-    fn at(self, pos: Position) -> VegaResult<T>;
-}
-
-impl<T> VegaMoreContext<T> for anyhow::Result<T> {
-    fn at(self, pos: Position) -> VegaResult<T> {
-        self.map_err(|ctx| (pos, ctx))
-    }
-}
 
 pub struct Input {
     pub source: Box<Path>,
     pub data: Box<str>,
 }
 
-#[doc(hidden)]
 #[macro_use]
 mod _macros {
     #[macro_export]
     macro_rules! here {
-        () => { format!("{}:{}:{}", file!(), line!(), column!()) };
+        () => {
+            format!("    at {}:{}:{}", file!(), line!(), column!())
+        };
     }
 
     #[macro_export]
@@ -53,4 +43,4 @@ mod _macros {
     }
 }
 
-pub use { here, hashmap };
+pub use { hashmap, here };
