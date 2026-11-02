@@ -17,7 +17,7 @@ fn main() -> anyhow::Result<()> {
         data: Box::from(
             r#"
                 // Comment
-                println + a
+                a + b * c
                 '\x7e'
                 "Hello, world!\e"
             "#
@@ -36,13 +36,41 @@ fn main() -> anyhow::Result<()> {
 
     println!();
 
-    let statements = Parser::new(&input, tokens.as_ref()).make_ast()?;
+    let statements = match Parser::new(&input, tokens.as_ref()).make_ast() {
+        Ok(statements) => statements,
+        Err((pos, err)) => {
+            for cause in err.chain() {
+                eprintln!("{cause:#?}");
+            }
+            let Position(start, end) = pos;
+            let (li, co) = line_and_column(&input.data, start as usize);
+            eprintln!("    at {}:{}:{}", input.source.display(), li, co);
+            eprintln!("-> {}", &input.data[start as usize..end as usize]);
+            exit(1);
+        }
+    };
 
     for stmt in statements.iter() {
-        println!("(main) stmt = {stmt:#?}");
+        println!("(main) stmt = {:}", stmt.kind.debug_with(&text));
     }
 
-    // let result = JIT::new(statements).eval_and_return_last()?;
+    // let result = Interpreter::new(statements).eval_and_return_last()?;
 
     Ok(())
+}
+
+pub fn line_and_column(contents: &str, start: usize) -> (u16, u16) {
+    let (mut line, mut column) = (1, 1);
+    for (i, ch) in contents.chars().enumerate() {
+        if i > start {
+            break;
+        }
+        if ch == '\n' {
+            line += 1;
+            column = 1;
+        } else {
+            column += 1;
+        }
+    }
+    (line, column)
 }

@@ -19,7 +19,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    pub fn make_ast(mut self) -> anyhow::Result<Box<[Expr]>> {
+    pub fn make_ast(mut self) -> VegaResult<Box<[Expr]>> {
         let mut statements: Vec<Expr> = vec![];
 
         while let Some(token) = self.peek() {
@@ -40,12 +40,13 @@ impl<'a> Parser<'a> {
     }
 
     /// Parse an expression with binding powers.
-    pub fn parse_expr_bp(&mut self, mbp: u8) -> anyhow::Result<Option<Expr>> {
+    pub fn parse_expr_bp(&mut self, mbp: u8) -> VegaResult<Option<Expr>> {
         let Some(token) = self.next() else { return Ok(None) };
         let mut lhs = match Op::prefix(token.kind) {
             Some(prefix) => {
                 let value = self.parse_expr_bp(prefix.bp().rbp)?
-                    .context("expected a value due to previous prefix operator")?;
+                    .context("expected a value due to previous prefix operator")
+                    .at(token.pos)?;
                 ExprKind::UnaryOp {
                     op: prefix,
                     value: Box::new(value)
@@ -54,16 +55,17 @@ impl<'a> Parser<'a> {
             None => match token.kind {
                 TokenKind::LParen => {
                     let lhs = self.parse_expr_bp(MIN_BP)?
-                        .context("expected a value")?;
-                    if let token = self.expect_next()? && token.kind != TokenKind::RParen {
-                        return None.context("expected right parenthesis");
+                        .context("expected a value")
+                        .at(token.pos)?;
+                    if let token = self.expect_next().at(token.pos)? && token.kind != TokenKind::RParen {
+                        return None.context("expected right parenthesis").at(token.pos);
                     }
                     lhs
                 }
                 TokenKind::Word(sym) => ExprKind::Ident(sym).at(token.pos),
                 TokenKind::String(sym) => ExprKind::String(sym).at(token.pos),
                 TokenKind::Char(ch) => ExprKind::Char(ch).at(token.pos),
-                _ => None.context(format!("unexpected {token}"))?
+                _ => None.context(format!("unexpected {}", token.kind)).at(token.pos)?
             }
         };
 
@@ -91,7 +93,8 @@ impl<'a> Parser<'a> {
                 }
                 _ => {
                     let rhs = self.parse_expr_bp(bp.rbp)?
-                        .context("expected a value due to previous operator")?;
+                        .context("expected a value due to previous operator")
+                        .at(token.pos)?;
                     lhs = ExprKind::BinaryOp {
                         op,
                         lhs: Box::new(lhs),

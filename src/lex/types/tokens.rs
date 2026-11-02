@@ -76,10 +76,10 @@ impl TokenKind {
 //     }
 // }
 
-impl fmt::Display for Token {
+impl fmt::Display for TokenKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use TokenKind as Kind;
-        let repr = match self.kind {
+        let repr = match self {
             Kind::Word(_) => "identifier",
             Kind::Keyword(_) => "keyword",
             Kind::String(_) => "string",
@@ -89,10 +89,10 @@ impl fmt::Display for Token {
             | Kind::Hyphen
             | Kind::Plus => "operator",
             // lazy programmer
-            | Kind::Comma
-            | Kind::Semicolon => "punctuation",
+            Kind::Comma => "comma",
+            Kind::Semicolon => "semicolon",
             _ => "token",
         };
-        write!(f, "{} (at {})", repr, self.pos)
+        write!(f, "{repr}")
     }
 }
