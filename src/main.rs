@@ -17,7 +17,7 @@ fn main() -> anyhow::Result<()> {
         data: Box::from(
             r#"
                 // Comment
-                a + b * c
+                a + b * c and d
                 '\x7e'
                 "Hello, world!\e"
             "#
@@ -45,7 +45,9 @@ fn main() -> anyhow::Result<()> {
             let Position(start, end) = pos;
             let (li, co) = line_and_column(&input.data, start as usize);
             eprintln!("    at {}:{}:{}", input.source.display(), li, co);
-            eprintln!("-> {}", &input.data[start as usize..end as usize]);
+            eprintln!();
+            eprintln!("{}", &input.data[start as usize..end as usize]);
+            eprintln!("{}", "^".repeat(end.saturating_sub(start) as usize).red());
             exit(1);
         }
     };
