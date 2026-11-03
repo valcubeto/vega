@@ -68,10 +68,13 @@ pub enum Op {
 
 impl Op {
     pub fn prefix<'s>(token: TokenKind) -> Option<Op> {
-        use TokenKind as K;
-        use Keyword as Kw;
+        use TokenKind as Tk;
         match token {
-            K::Keyword(Kw::Not) => Some(Op::Not),
+            // -x
+            Tk::Hyphen => Some(Op::Neg),
+            // not x
+            Tk::Tilde => Some(Op::BitNot),
+            Tk::Keyword(Keyword::Not) => Some(Op::Not),
             _ => None
         }
     }
@@ -84,6 +87,8 @@ impl Op {
             K::Hyphen => Some(Op::Sub),
             K::Star => Some(Op::Mul),
             K::Slash => Some(Op::Div),
+            K::Keyword(Keyword::And) => Some(Op::And),
+            K::Keyword(Keyword::Or) => Some(Op::Or),
             _ => None
         }
     }

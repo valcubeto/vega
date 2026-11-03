@@ -49,6 +49,7 @@ keywords! {
     "struct" => Struct,
     "enum" => Enum,
     "union" => TaggedUnion,
+    "bitflags" => BitFlags,
     "class" => Interface,
     "type" => TypeAlias,
     "impl" => Implement,

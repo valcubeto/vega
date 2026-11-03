@@ -40,8 +40,8 @@ impl ExprKind {
     pub fn debug_with(&self, text: &Interner) -> String {
         match self {
             Self::Char(ch) => format!("{:?}", ch).yellow().to_string(),
-            Self::String(sym) => format!("{:?}", text.lookup(*sym).unwrap_or("<not found>")).yellow().to_string(),
-            Self::Ident(sym) => format!("{}", text.lookup(*sym).unwrap_or("<not found>").underlined()),
+            Self::String(sym) => format!("{:?}", text.lookup(*sym)).yellow().to_string(),
+            Self::Ident(sym) => format!("{}", text.lookup(*sym).underlined()),
             Self::BinaryOp { op, lhs, rhs } => format!("({} {:?} {})", lhs.kind.debug_with(text), op, rhs.kind.debug_with(text)),
             Self::UnaryOp { op, value } => format!("({:?} {})", op, value.kind.debug_with(text)),
             // Self::If { condition, body, else_block } => format!()

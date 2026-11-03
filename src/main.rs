@@ -12,6 +12,8 @@ use common::*;
 use ir::parsing::Parser;
 use lex::{parsing::Lexer, types::tokens::*};
 
+use crate::interpreter::runtime::Runtime;
+
 fn main() -> anyhow::Result<()> {
     let input = Input {
         source: Box::from(Path::new("stdin")),
@@ -26,12 +28,12 @@ fn main() -> anyhow::Result<()> {
     };
     println!("(main) data = r#\"{}\"#", input.data);
 
-    let (text, tokens) = Lexer::new(&input).lex()?;
+    let (mut text, tokens) = Lexer::new(&input).lex()?;
 
     for token in tokens.iter() {
         println!("(main) token = {token:?}");
         if let TokenKind::String(sym) = token.kind {
-            println!("             = String({:?})", text.lookup(sym).unwrap());
+            println!("             = String({:?})", text.lookup(sym));
         }
     }
 
@@ -57,6 +59,8 @@ fn main() -> anyhow::Result<()> {
         println!("(main) stmt = {:}", stmt.kind.debug_with(&text));
     }
 
+    let mut rt = Runtime::default_with(&mut text);
+    println!("(main) rt.env = {}", rt.debug_with(&text));
     // let result = Interpreter::new(statements).eval_and_return_last()?;
 
     Ok(())

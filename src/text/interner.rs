@@ -25,7 +25,7 @@ impl Interner {
         self.data.get_or_intern(string)
     }
 
-    pub fn lookup(&self, sym: Symbol) -> Option<&str> {
-        self.data.resolve(sym)
+    pub fn lookup(&self, sym: Symbol) -> &str {
+        self.data.resolve(sym).expect("interned key was not present")
     }
 }

@@ -21,7 +21,6 @@ pub enum TokenKind {
 
     NewLine,
     Semicolon,
-
     Comma,
 
     LParen,
@@ -32,13 +31,20 @@ pub enum TokenKind {
     RBracket,
     Hash,
 
+    /// `==`
     Equals,
+    /// `!=`
+    NotEquals,
+    /// `=`
     Assign,
 
     Plus,
+    /// `-`
     Hyphen,
     Star,
     Slash,
+    /// `~`
+    Tilde,
 }
 
 #[derive(Debug)]
@@ -83,14 +89,15 @@ impl fmt::Display for TokenKind {
             Kind::Word(_) => "identifier",
             Kind::Keyword(_) => "keyword",
             Kind::String(_) => "string",
-            Kind::Char(_) => "character",
+            // I'd append the char here...
+            Kind::Char(ch) => &format!("character {ch}")[..],
             | Kind::Assign
             | Kind::Equals
             | Kind::Hyphen
             | Kind::Plus => "operator",
-            // lazy programmer
             Kind::Comma => "comma",
             Kind::Semicolon => "semicolon",
+            // Lazy programmer
             _ => "token",
         };
         write!(f, "{repr}")
